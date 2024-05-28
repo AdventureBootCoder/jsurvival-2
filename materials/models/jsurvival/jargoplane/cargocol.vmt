@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models\jsurvival\jargoplane\cargocol01"
+	"$bumpmap" "models\jsurvival\jargoplane\cargocol_normal"
+}

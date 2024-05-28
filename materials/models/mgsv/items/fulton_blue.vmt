@@ -1,0 +1,27 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models\mgsv/items/fulton_blue"
+	"$bumpmap" "models\mgsv/items/fulton_n"
+	"$halflambert"     "1"
+	$nocull 1
+ 
+	"$phong"      "1"
+	"$phongboost"     "0.1"
+	"$normalmapalphaphongmask" "1"
+//	"$phongexponenttexture" "models\weapons\v_models\cyber_scarh\scar_h_s"
+	"$phongfresnelranges"   "[5 10 10]"
+ 
+	"$normalmapalphaenvmapmask" "1"
+//	"$envmap"      "env_cubemap"
+	"$envmaptint"     "[ 0.005 0.005 0.005 ]"
+	"$envmapfresnel"   "1"
+	"$envmapFresnelMinMaxExp" "[0 4 .4]"
+ 
+	"$rimlight"     "1"
+	"$rimlightexponent"   "30" 
+	"$rimlightboost"   "0.5"
+	"$rimmask"      "1"
+	
+
+	
+}

@@ -1,0 +1,40 @@
+"jsurvival"
+{
+	"base"		 "base"
+	"title"		 "JSurvival"
+	"category"	 "other"
+	"menusystem" "1"
+	"version"	 "1"
+
+	"settings"
+	{
+		1
+		{
+			"name"		"js_zombies"
+			"text"		"Enable zombie spawn"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		2
+		{
+			"name"		"js_maxloot"
+			"text"		"Maximum count of loot and zombies (if enabled)"
+			"type"		"Numeric"
+			"default"	"128"
+		}
+		3
+		{
+			"name"		"js_walkspeed"
+			"text"		"Default player walk speed (recommended to leave 160)"
+			"type"		"Numeric"
+			"default"	"160"
+		}
+		4
+		{
+			"name"		"js_runspeed"
+			"text"		"Default player run speed (recommended to leave 280)"
+			"type"		"Numeric"
+			"default"	"280"
+		}
+	}
+}
