@@ -22,10 +22,10 @@ JSMod.ResourceToJBux = {
 }
 JSMod.ItemToJBux = {
 	["ent_jack_gmod_ezanomaly_gnome"] = 10000,
-	["ent_jack_gmod_ezarmor"] = 100,
-	["ent_jack_gmod_ezatmine"] = 200,
+	["ent_jack_gmod_ezarmor"] = 200,
+	["ent_jack_gmod_ezatmine"] = 300,
 	["ent_jack_gmod_ezfragnade"] = 25,
-	["ent_jack_gmod_ezfumigator"] = 100,
+	["ent_jack_gmod_ezfumigator"] = 1000,
 }
 JSMod.CurrentResourcePrices = table.FullCopy(JSMod.ResourceToJBux)
 JSMod.JBuxList = JSMod.JBuxList or {}
