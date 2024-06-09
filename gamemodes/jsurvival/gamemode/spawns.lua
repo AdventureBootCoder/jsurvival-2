@@ -2,7 +2,7 @@ PropSpawnTable = {}
 local PropLoot = {
 	[1] = {
 		Type = "zombies",
-		Loot = {"npc_zombie", "npc_headcrab", "npc_zombie_torso", " npc_antlion"}
+		Loot = {"npc_zombie", "npc_headcrab", "npc_zombie_torso"}
 	},
 	[2] = {
 		Type = "loot",

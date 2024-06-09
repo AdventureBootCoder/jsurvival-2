@@ -2,11 +2,11 @@ include("shared.lua")
 
 local Cheats = GetConVar("sv_cheats")
 hook.Add("SpawnMenuOpen", "JS_SPAWNMENU_BLOCK", function()
-	if Cheats:GetInt() == 0 then return false end
+	--if not(Cheats:GetBool() or JMod.IsAdmin(ply)) then return false end
 end)
 
 hook.Add("ContextMenuOpen", "JS_CONTEXTMENU_BLOCK", function()
-	if Cheats:GetInt() == 0 then return false end
+	--if not(Cheats:GetBool() or JMod.IsAdmin(ply)) then return false end
 end)
 
 local VignetteMat = Material("mats_jack_gmod_sprites/hard_vignette.png")
