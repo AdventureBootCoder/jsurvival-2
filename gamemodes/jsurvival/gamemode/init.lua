@@ -45,6 +45,7 @@ end)
 
 hook.Add("SetupMove", "JS_SPRINT", function(ply, mv, cmd)
 	if ply:InVehicle() then return end
+	if ply:GetMoveType() == MOVETYPE_NOCLIP then return end
 	if ply:IsSprinting() then
 		local Stamina = ply:GetNW2Float("JS_Stamina", 0)
 		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 0.05, 0, 100))

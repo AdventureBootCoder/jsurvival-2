@@ -1,13 +1,5 @@
 include("shared.lua")
 
-local Cheats = GetConVar("sv_cheats")
---[[hook.Add("SpawnMenuOpen", "JS_SPAWNMENU_BLOCK", function()
-	if not JMod.IsAdmin(LocalPlayer()) then return false end
-end)
-
-hook.Add("ContextMenuOpen", "JS_CONTEXTMENU_BLOCK", function()
-	if not JMod.IsAdmin(LocalPlayer()) then return false end
-end)]]
 
 local VignetteMat = Material("mats_jack_gmod_sprites/hard_vignette.png")
 local OldHealth, NewHealth = -1, -1

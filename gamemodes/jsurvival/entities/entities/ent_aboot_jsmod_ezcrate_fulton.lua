@@ -180,7 +180,7 @@ if SERVER then
 	end
 
 	function ENT:Use(activator)
-		if (self:GetItemCount() <= 0) or IsValid(self.Fulton) then return end
+		if (self:GetItemCount() <= 0) or IsValid(self.PlaneComing) then return end
 		local Alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
 		if Alt then
 			self:ReleaseFulton(activator)

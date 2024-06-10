@@ -184,7 +184,7 @@ local StandardRate = 200 -- To cover fuel ;)
 hook.Add("JMod_CanRadioRequest", "JSMOD_MONEY_CHECK", function(ply, transceiver, pkg)
 	local station = JMod.EZ_RADIO_STATIONS[transceiver:GetOutpostID()]
 
-	if pkg == "stocks" then
+	--[[if pkg == "stocks" then
 		timer.Simple(1, function()
 			if not(IsValid(transceiver)) then return end
 			local Msg, Num = 'current stock prices are:', 1
@@ -218,7 +218,7 @@ hook.Add("JMod_CanRadioRequest", "JSMOD_MONEY_CHECK", function(ply, transceiver,
 		end)
 
 		return true
-	end
+	end--]]
 
 	local PackageSpecs = JMod.Config.RadioSpecs.AvailablePackages[pkg]
 	if not(PackageSpecs) then return end
@@ -355,12 +355,12 @@ hook.Add("Think", "JSMOD_STOCKSIM", function()
 		NextStockUpdate = Time + 60
 
 		JSMod.CurrentResourcePrices = JSMod.CurrentResourcePrices or table.FullCopy(JSMod.ResourceToJBux)
-		for k, v in pairs(JSMod.CurrentResourcePrices) do
+		--[[for k, v in pairs(JSMod.CurrentResourcePrices) do
 			local BaseAmt = JSMod.ResourceToJBux[k]
 			local Low, High = BaseAmt * 0.5, BaseAmt * 1.5
 			local CurAmt = JSMod.CurrentResourcePrices[k]
 			JSMod.CurrentResourcePrices[k] = math.Clamp(CurAmt + math.Round(math.Rand(-0.01, 0.01), 2), Low, High)
-		end
+		end--]]
 	end
 end)
 
