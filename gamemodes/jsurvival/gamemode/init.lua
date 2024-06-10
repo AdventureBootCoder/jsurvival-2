@@ -6,6 +6,7 @@ include("shared.lua")
 include("spawns.lua")
 include("sv_radioecon.lua") -- This is server only stuff
 resource.AddWorkshop("1919689921")
+
 function GM:Initialize()
 end
 
@@ -81,23 +82,36 @@ function GM:PlayerLoadout(ply)
 	ply:SetRunSpeed(runspeed:GetInt() or 280)
 end
 
-function GM:PlayerSpawnProp( ply, model )
-	if not JMod.IsAdmin(ply) then
-		return false
+if SERVER then
+	function GM:PlayerSpawnProp( ply, model )
+		if not JMod.IsAdmin(ply) then
+			return false
+		end
 	end
+
+	function GM:PlayerSpawnRagdoll( ply, model )
+		if not JMod.IsAdmin(ply) then
+			return false
+		end
+	end
+
+	function GM:PlayerSpawnSENT(ply, class)
+		if not JMod.IsAdmin(ply) then
+			return false
+		end
+	end
+
+	hook.Add( "PlayerSpawnSWEP", "SpawnBlockSWEP", function(ply, class, info)
+		if not JMod.IsAdmin(ply) then
+			return false
+		end
+	end)
+
+	hook.Add("PlayerSpawnObject", "JS_SPAWN_BLOCK", function(ply)
+		if not(Cheats:GetBool() or JMod.IsAdmin(ply)) then return false end
+	end)
+
+	hook.Add( "PlayerGiveSWEP", "JS_BLOCK_GIVESWEP", function(ply, class, swep)
+		if not(Cheats:GetBool() or JMod.IsAdmin(ply)) then return false end
+	end)
 end
-function GM:PlayerSpawnRagdoll( ply, model )
-	if not JMod.IsAdmin(ply) then
-		return false
-	end
-end
-function GM:PlayerSpawnSENT( ply, class )
-	if not JMod.IsAdmin(ply) then
-		return false
-	end
-end
-hook.Add( "PlayerSpawnSWEP", "SpawnBlockSWEP", function( ply, class, info )
-	if not JMod.IsAdmin(ply) then
-		return false
-	end
-end )

@@ -20,14 +20,6 @@ if SERVER then
 		net.WriteString(msg)
 		net.Send(ply)
 	end
-
-	hook.Add("PlayerSpawnObject", "JS_SPAWN_BLOCK", function(ply)
-		if not(Cheats:GetBool() or JMod.IsAdmin(ply)) then return false end
-	end)
-
-	hook.Add( "PlayerGiveSWEP", "JS_BLOCK_GIVESWEP", function(ply, class, swep)
-		if not(Cheats:GetBool() or JMod.IsAdmin(ply)) then return false end
-	end)
 elseif CLIENT then
 	net.Receive("betterchatprint", function()
 		chat.AddText(net.ReadColor(), net.ReadString())
