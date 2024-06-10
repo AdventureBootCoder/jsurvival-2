@@ -96,8 +96,8 @@ function GM:PlayerSpawnSENT( ply, class )
 		return false
 	end
 end
-function GM:PlayerSpawnSWEP( ply, class, info )
+hook.Add( "PlayerSpawnSWEP", "JS_BLOCK_SWEPSPAWN", function( ply, class, info )
 	if not JMod.IsAdmin(ply) then
 		return false
 	end
-end
+end )
