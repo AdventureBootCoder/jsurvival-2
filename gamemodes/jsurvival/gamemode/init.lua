@@ -79,3 +79,24 @@ function GM:PlayerLoadout(ply)
 	ply:SetWalkSpeed(walkspeed:GetInt() or 160)
 	ply:SetRunSpeed(runspeed:GetInt() or 280)
 end
+
+function GM:PlayerSpawnProp( ply, model )
+	if not JMod.IsAdmin(ply) then
+		return false
+	end
+end
+function GM:PlayerSpawnRagdoll( ply, model )
+	if not JMod.IsAdmin(ply) then
+		return false
+	end
+end
+function GM:PlayerSpawnSENT( ply, class )
+	if not JMod.IsAdmin(ply) then
+		return false
+	end
+end
+hook.Add( "PlayerSpawnSWEP", "SpawnBlockSWEP", function( ply, class, info )
+	if not JMod.IsAdmin(ply) then
+		return false
+	end
+end )
