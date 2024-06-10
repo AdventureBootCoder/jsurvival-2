@@ -82,7 +82,7 @@ function GM:PlayerLoadout(ply)
 end
 
 function GM:PlayerSpawnProp( ply, model )
-	if not JMod.IsAdmin(ply) then
+	if not JMod.IsAdmin(ply) then 
 		return false
 	end
 end
@@ -96,8 +96,8 @@ function GM:PlayerSpawnSENT( ply, class )
 		return false
 	end
 end
-hook.Add( "PlayerSpawnSWEP", "SpawnBlockSWEP", function( ply, class, info )
+function GM:PlayerSpawnSWEP( ply, class, info )
 	if not JMod.IsAdmin(ply) then
 		return false
 	end
-end )
+end
