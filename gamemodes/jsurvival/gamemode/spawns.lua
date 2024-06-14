@@ -90,62 +90,69 @@ end)
 
 timer.Create("prop_spawn", 3, 0, SpawnPropTimer)
 
-hook.Add("PlayerSpawn", "JS_RANDOM_SPAWN_DROP", function(ply)
+hook.Add("PlayerSpawn", "JS_RANDOM_SPAWN_DROP", function(ply, transist)
+	if transist then return end
 	local Navmeshareas = navmesh.GetAllNavAreas()
-	if not table.IsEmpty(Navmeshareas) then
-		local Randompos = Navmeshareas[math.random(#Navmeshareas)]:GetCenter()
-		local SpawnPos = util.QuickTrace(Randompos, Vector(0, 0, 128)).HitPos - Vector(0, 0, 64)
+	local SpawnPos = ply:GetPos()
 
-		local DropPos = JMod.FindDropPosFromSignalOrigin(SpawnPos)
-
-		if DropPos then
-			ply:SetPos(DropPos)
-			ply:SetNoDraw(true)
-			local DropVelocity = VectorRand()
-			DropVelocity.z = 0
-			DropVelocity:Normalize()
-			DropVelocity = DropVelocity * 400
-			local Eff = EffectData()
-			Eff:SetOrigin(DropPos)
-			Eff:SetStart(DropVelocity)
-			util.Effect("eff_jack_gmod_jetflyby", Eff, true, true)
-	
-			timer.Simple(0.9, function()
-				if not IsValid(ply) or not ply:Alive() or (ply:InVehicle()) then return end
-				local Box = ents.Create("ent_jack_aidbox")
-				Box:SetPos(DropPos)
-				Box.InitialVel = -DropVelocity * 10
-				Box.Contents = {}
-				Box.NoFadeIn = true
-				Box:SetDTBool(0, "true")
-				Box:Spawn()
-				----- Create the chair
-				Box.Pod = ents.Create("prop_vehicle_prisoner_pod")
-				Box.Pod:SetModel("models/vehicles/prisoner_pod_inner.mdl")
-				local Ang, Up, Right, Forward = Box:GetAngles(), Box:GetUp(), Box:GetRight(), Box:GetForward()
-				Box.Pod:SetPos(Box:GetPos() - Up * 30)
-				Ang:RotateAroundAxis(Up, 0)
-				Ang:RotateAroundAxis(Forward, 0)
-				Box.Pod:SetAngles(Ang)
-				Box.Pod:Spawn()
-				Box.Pod:Activate()
-				Box.Pod:SetParent(Box)
-				Box.Pod:SetNoDraw(true)
-				Box.Pod:SetThirdPersonMode(true)
-				------
-				Box:SetPackageName(ply:Nick())
-				ply:EnterVehicle(Box.Pod)
-				---
-				sound.Play("snd_jack_flyby_drop.mp3", DropPos, 150, 100)
-	
-				for k, playa in pairs(ents.FindInSphere(DropPos, 6000)) do
-					if playa:IsPlayer() then
-						sound.Play("snd_jack_flyby_drop.mp3", playa:GetShootPos(), 50, 100)
-					end
-				end
-			end)
-		else
-			ply:SetPos(SpawnPos)
+	if next(Navmeshareas) then
+		local RandomMesh = Navmeshareas[math.random(#Navmeshareas)]
+		local Tries = 0
+		while (RandomMesh:IsUnderwater()) and (Tries < 1000) do
+			Tries = Tries + 1
+			RandomMesh = Navmeshareas[math.random(#Navmeshareas)]
 		end
+		local Randompos = RandomMesh:GetCenter()
+		SpawnPos = util.QuickTrace(Randompos, Vector(0, 0, 128)).HitPos - Vector(0, 0, 64)
+	end
+
+	local DropPos = JMod.FindDropPosFromSignalOrigin(SpawnPos)
+
+	if DropPos then
+		ply:SetPos(DropPos)
+		ply:SetNoDraw(true)
+		local DropVelocity = VectorRand()
+		DropVelocity.z = 0
+		DropVelocity:Normalize()
+		DropVelocity = DropVelocity * 400
+		local Eff = EffectData()
+		Eff:SetOrigin(DropPos)
+		Eff:SetStart(DropVelocity)
+		util.Effect("eff_jack_gmod_jetflyby", Eff, true, true)
+
+		timer.Simple(0.9, function()
+			if not IsValid(ply) or not ply:Alive() or (ply:InVehicle()) then return end
+			local Box = ents.Create("ent_jack_aidbox")
+			Box:SetPos(DropPos)
+			Box.InitialVel = -DropVelocity * 10
+			Box.Contents = {}
+			Box.NoFadeIn = true
+			Box:SetDTBool(0, "true")
+			Box:Spawn()
+			----- Create the chair
+			Box.Pod = ents.Create("prop_vehicle_prisoner_pod")
+			Box.Pod:SetModel("models/vehicles/prisoner_pod_inner.mdl")
+			local Ang, Up, Right, Forward = Box:GetAngles(), Box:GetUp(), Box:GetRight(), Box:GetForward()
+			Box.Pod:SetPos(Box:GetPos() - Up * 30)
+			Ang:RotateAroundAxis(Up, 0)
+			Ang:RotateAroundAxis(Forward, 0)
+			Box.Pod:SetAngles(Ang)
+			Box.Pod:Spawn()
+			Box.Pod:Activate()
+			Box.Pod:SetParent(Box)
+			Box.Pod:SetNoDraw(true)
+			Box.Pod:SetThirdPersonMode(true)
+			------
+			Box:SetPackageName(ply:Nick())
+			ply:EnterVehicle(Box.Pod)
+			---
+			sound.Play("snd_jack_flyby_drop.mp3", DropPos, 150, 100)
+
+			for k, playa in pairs(ents.FindInSphere(DropPos, 6000)) do
+				if playa:IsPlayer() then
+					sound.Play("snd_jack_flyby_drop.mp3", playa:GetShootPos(), 50, 100)
+				end
+			end
+		end)
 	end
 end)

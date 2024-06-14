@@ -83,21 +83,29 @@ function GM:PlayerLoadout(ply)
 end
 
 if SERVER then
+	local Cheats = GetConVar("sv_cheats")
+	
 	function GM:PlayerSpawnProp( ply, model )
 		if not JMod.IsAdmin(ply) then
 			return false
+		else
+			return true
 		end
 	end
 
 	function GM:PlayerSpawnRagdoll( ply, model )
 		if not JMod.IsAdmin(ply) then
 			return false
+		else
+			return true
 		end
 	end
 
 	function GM:PlayerSpawnSENT(ply, class)
 		if not JMod.IsAdmin(ply) then
 			return false
+		else
+			return true
 		end
 	end
 
