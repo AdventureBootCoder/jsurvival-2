@@ -36,5 +36,12 @@
 			"type"		"Numeric"
 			"default"	"280"
 		}
+		5
+		{
+			"name"		"js_paraspawn"
+			"text"		"Enable parachute spawns"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
 	}
 }
