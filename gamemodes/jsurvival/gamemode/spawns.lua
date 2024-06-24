@@ -89,9 +89,9 @@ hook.Add("PostCleanupMap", "RandomLootDelete", function()
 end)
 
 timer.Create("prop_spawn", 3, 0, SpawnPropTimer)
-
-hook.Add("PlayerSpawn", "JS_RANDOM_SPAWN_DROP", function(ply, transist)
-	if transist then return end
+local paraspawn = GetConVar("js_paraspawn")
+hook.Add("PlayerSpawn", "JS_RANDOM_SPAWN_DROP", function(ply, transit)
+	if transit then return end
 	timer.Simple(0.01, function()
 		local Navmeshareas = navmesh.GetAllNavAreas()
 		local SpawnPos = ply:GetPos()
@@ -109,8 +109,7 @@ hook.Add("PlayerSpawn", "JS_RANDOM_SPAWN_DROP", function(ply, transist)
 		end
 
 		local DropPos = JMod.FindDropPosFromSignalOrigin(SpawnPos)
-
-		if DropPos then
+		if DropPos and paraspawn:GetBool() then
 			ply:SetPos(DropPos)
 			ply:SetNoDraw(true)
 			local DropVelocity = VectorRand()
