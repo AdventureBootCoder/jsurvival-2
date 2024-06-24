@@ -79,6 +79,20 @@ if SERVER then
 			return false
 		end
 	end
+	function GM:PlayerSpawnNPC(ply, npc_type, weapon)
+		if JMod.IsAdmin(ply) then 
+			return true 
+		else
+			return false
+		end
+	end
+    function GM:PlayerSpawnVehicle(ply, model, name, table)
+		if JMod.IsAdmin(ply) then 
+			return true 
+		else
+			return false
+		end
+	end
 	function GM:PlayerSpawnSENT(ply, class)
 		if JMod.IsAdmin(ply) then 
 			return true 
