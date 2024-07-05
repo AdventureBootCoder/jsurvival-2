@@ -30,31 +30,7 @@ JSMod.ItemToJBux = {
 JSMod.CurrentResourcePrices = table.FullCopy(JSMod.ResourceToJBux)
 JSMod.JBuxList = JSMod.JBuxList or {}
 
-function JSMod.GetJBux(ply)
-	local JBuckaroos = JSMod.JBuxList[ply:SteamID()]
-	if not JBuckaroos then
-		JSMod.JBuxList[ply:SteamID()] = 0
-		return 0
-	end
-	return JBuckaroos
-end
-
-function JSMod.SetJBux(ply, amt, silent)
-	if not(IsValid(ply)) then return end
-	local OldAmt = JSMod.GetJBux(ply)
-	local amt = math.floor(amt)
-	JSMod.JBuxList[ply:SteamID()] = amt
-
-	if silent then return end
-
-	if (amt < OldAmt) then
-		BetterChatPrint(ply, "That cost you ".. tostring(OldAmt - amt) .." JBux!", color_orange)
-	elseif (amt > OldAmt) then
-		BetterChatPrint(ply, "You have gained ".. tostring(amt - OldAmt) .." JBux!", color_orange)
-	end
-end
-
-function JSMod.CalcJBuxWorth(item, amount)
+function GM:CalcJBuxWorth(item, amount)
 	if not(item) then return 0 end
 	amount = amount or 1
 
@@ -74,7 +50,7 @@ function JSMod.CalcJBuxWorth(item, amount)
 		end
 	elseif typToCheck == "table" then
 		for typ, amt in pairs(item) do
-			JBuxToGain = JBuxToGain + JSMod.CalcJBuxWorth(typ, amt)
+			JBuxToGain = JBuxToGain + GM:CalcJBuxWorth(typ, amt)
 		end
 	end
 	return JBuxToGain, Exportables
@@ -146,7 +122,7 @@ local function AutoCalcPrice(contents, searchRadioManifest)
 end
 
 concommand.Add("js_jbux_check", function(ply, cmd, args)
-	BetterChatPrint(ply, "You have ".. tostring(JSMod.GetJBux(ply)) .." JBux!", color_orange)
+	BetterChatPrint(ply, "You have ".. tostring(GAMEMODE:GetJBux(ply)) .." JBux!", color_orange)
 end, "Shows you your current JBux")
 
 concommand.Add("js_jbux_donate", function(ply, cmd, args)
@@ -163,12 +139,12 @@ concommand.Add("js_jbux_donate", function(ply, cmd, args)
 	end
 
 	if (recipient) and (recipient:Alive()) then 
-		JSMod.SetJBux(recipient, JSMod.GetJBux(recipient) + amt, true)
+		JSMod.SetJBux(recipient, GAMEMODE:GetJBux(recipient) + amt, true)
 		BetterChatPrint(recipient, "You got ".. tostring(amt) .." JBux!", color_orange)
 		BetterChatPrint(ply, "You donated ".. tostring(amt) .." JBux!", color_orange)
 	elseif string.lower(target) == "team" then
 		recipient = ply:Team()
-		JSMod.SetJBux(recipient, JSMod.GetJBux(recipient) + amt, true)
+		JSMod.SetJBux(recipient, GAMEMODE:GetJBux(recipient) + amt, true)
 		BetterChatPrint(ply, "You donated ".. tostring(amt) .." JBux!", color_orange)
 	end
 end, "Donates JBux to someone or your team")
@@ -228,11 +204,11 @@ hook.Add("JMod_CanRadioRequest", "JSMOD_MONEY_CHECK", function(ply, transceiver,
 	end
 	ReqAmount = ReqAmount + StandardRate
 	if (ReqAmount <= 0) or (PackageSpecs.JBuxFree) then return end
-	local PlyAmt = JSMod.GetJBux(ply)
+	local PlyAmt = GAMEMODE:GetJBux(ply)
 	if PlyAmt <= ReqAmount then 
 		return false, "Not enough JBux! (You need: "..tostring(ReqAmount - PlyAmt).." more)" 
 	else
-		JSMod.SetJBux(ply, PlyAmt - ReqAmount)
+		GAMEMODE:SetJBux(ply, PlyAmt - ReqAmount)
 	end
 end)
 
@@ -269,10 +245,10 @@ hook.Add("JMod_OnRadioDeliver", "JSMOD_EXPORT_GOODS", function(stationID, dropPo
 		----
 		timer.Simple(15, function()
 			if IsValid(Heli) then
-				local JbuxToGain, Exportables = JSMod.CalcJBuxWorth(AvaliableResources)
+				local JbuxToGain, Exportables = GM:CalcJBuxWorth(AvaliableResources)
 				
 				if (JBuxToGain > 0) and station.plyToCredit then
-					JSMod.SetJBux(station.plyToCredit, JSMod.GetJBux(station.plyToCredit) + JBuxToGain)
+					JSMod.SetJBux(station.plyToCredit, GAMEMODE:GetJBux(station.plyToCredit) + JBuxToGain)
 					JMod.ConsumeResourcesInRange(Exportables, ExportPos, 200, nil, false)
 					station.plyToCredit = nil
 				end
