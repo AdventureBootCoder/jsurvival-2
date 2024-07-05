@@ -194,6 +194,11 @@ if SERVER then
 	end
 
 	function ENT:Think()
+		if IsValid(self.Fulton) and not IsValid(self.Cable) then
+			SafeRemoveEntity(self.Fulton)
+			self.Fulton = nil
+			self.PlaneComing = false
+		end
 	end
 
 	--pfahahaha
