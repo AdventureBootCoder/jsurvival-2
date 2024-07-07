@@ -13,6 +13,7 @@
 			"name"		"js_zombies"
 			"text"		"Enable zombie spawn"
 			"type"		"CheckBox"
+			"singleplayer"	"1"
 			"default"	"0"
 		}
 		2
@@ -20,6 +21,7 @@
 			"name"		"js_maxloot"
 			"text"		"Maximum count of loot and zombies (if enabled)"
 			"type"		"Numeric"
+			"singleplayer"	"1"
 			"default"	"128"
 		}
 		3
@@ -27,6 +29,7 @@
 			"name"		"js_walkspeed"
 			"text"		"Default player walk speed (recommended to leave 160)"
 			"type"		"Numeric"
+			"singleplayer"	"1"
 			"default"	"160"
 		}
 		4
@@ -34,6 +37,7 @@
 			"name"		"js_runspeed"
 			"text"		"Default player run speed (recommended to leave 280)"
 			"type"		"Numeric"
+			"singleplayer"	"1"
 			"default"	"280"
 		}
 		5
@@ -41,6 +45,7 @@
 			"name"		"js_paraspawn"
 			"text"		"Enable parachute spawns"
 			"type"		"CheckBox"
+			"singleplayer"	"1"
 			"default"	"0"
 		}
 	}
