@@ -1,8 +1,8 @@
 DeriveGamemode("sandbox")
 GM.Name = "JSurvival"
-GM.Author = "плыв, AdventureBoots"
-GM.Email = "плыв"
-GM.Website = "плыв"
+GM.Author = "AdventureBoots"
+GM.Email = ""
+GM.Website = ""
 local Cheats = GetConVar("sv_cheats")
 JSMod = JSMod or {}
 hook.Add("PlayerNoClip", "js-noclip", function(ply, desiredState)

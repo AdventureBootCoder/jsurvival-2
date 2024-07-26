@@ -89,72 +89,103 @@ hook.Add("PostCleanupMap", "RandomLootDelete", function()
 end)
 
 timer.Create("prop_spawn", 3, 0, SpawnPropTimer)
+
 local paraspawn = GetConVar("js_paraspawn")
+
+hook.Add("PlayerSelectSpawn", "JSurvivalSelectSpawn", function(ply) 
+	if not paraspawn:GetBool() then return end
+	local SpawnPos = ply:GetPos()
+	local Navmeshareas = navmesh.GetAllNavAreas()
+	local GoodRadio = false
+
+	for _, radio in ents.Iterator() do
+		if IsValid(radio) and radio.EZradio and (JMod.GetEZowner(radio) == ply) then 
+			local RadioPos = radio:GetPos()
+			if (radio:GetState() > JMod.EZ_STATE_OFF) and util.QuickTrace(RadioPos, Vector(0, 0, 9e9), {radio, ply}).HitSky then
+				SpawnPos = util.QuickTrace(RadioPos, Vector(math.random(-500, 500), math.random(-500, 500), 128)).HitPos - Vector(0, 0, 64)
+				GoodRadio = true
+				break
+			end
+		end
+	end
+	
+	if not(GoodRadio) and next(Navmeshareas) then
+		local RandomMesh = Navmeshareas[math.random(#Navmeshareas)]
+		local Randompos = RandomMesh:GetCenter()
+		local Tries = 0
+		while not(RandomMesh:IsUnderwater()) and (util.QuickTrace(Randompos, Vector(0, 0, 9e9), ply).HitSky) and (Tries < 1000) do
+			Tries = Tries + 1
+			RandomMesh = Navmeshareas[math.random(#Navmeshareas)]
+			Randompos = RandomMesh:GetCenter()
+		end
+		SpawnPos = util.QuickTrace(Randompos, Vector(0, 0, 128)).HitPos - Vector(0, 0, 64)
+	end
+
+	local DropPos = JMod.FindDropPosFromSignalOrigin(SpawnPos)
+	if DropPos then
+		local Box = ents.Create("ent_jack_aidbox")
+		Box:SetPos(DropPos)
+		Box:SetAngles(Angle(0, 0, 0))
+		Box.InitialVel = Vector(0, 0, 0)
+		Box.Contents = {}
+		Box.NoFadeIn = true
+		Box:SetDTBool(0, "true")
+		Box:Spawn()
+		----- Create the chair
+		Box.Pod = ents.Create("prop_vehicle_prisoner_pod")
+		Box.Pod:SetModel("models/vehicles/prisoner_pod_inner.mdl")
+		local Ang, Up, Right, Forward = Box:GetAngles(), Box:GetUp(), Box:GetRight(), Box:GetForward()
+		Box.Pod:SetPos(Box:GetPos() - Up * 30)
+		Ang:RotateAroundAxis(Up, 0)
+		Ang:RotateAroundAxis(Forward, 0)
+		Box.Pod:SetAngles(Ang)
+		Box.Pod:Spawn()
+		Box.Pod:Activate()
+		Box.Pod:SetParent(Box)
+		Box.Pod:SetNoDraw(true)
+		Box.Pod:SetThirdPersonMode(true)
+		------
+		Box:SetPackageName(ply:Nick())
+		------
+		Box:SetNoDraw(true)
+		Box:GetPhysicsObject():EnableMotion(false)
+		ply.BoxToEnter = Box
+
+		return Box
+	end
+end)
+
 hook.Add("PlayerSpawn", "JS_RANDOM_SPAWN_DROP", function(ply, transit)
 	if transit then return end
-	timer.Simple(0.01, function()
-		local Navmeshareas = navmesh.GetAllNavAreas()
-		local SpawnPos = ply:GetPos()
+	local DropPos = ply:GetPos()
+	if DropPos and paraspawn:GetBool() and IsValid(ply.BoxToEnter) then
+		local DropVelocity = VectorRand()
+		DropVelocity.z = 0
+		DropVelocity:Normalize()
+		DropVelocity = DropVelocity * 400
+		local Eff = EffectData()
+		Eff:SetOrigin(DropPos)
+		Eff:SetStart(DropVelocity)
+		util.Effect("eff_jack_gmod_jetflyby", Eff, true, true)
 
-		if next(Navmeshareas) then
-			local RandomMesh = Navmeshareas[math.random(#Navmeshareas)]
-			local Randompos = RandomMesh:GetCenter()
-			local Tries = 0
-			while (RandomMesh:IsUnderwater()) and not(util.QuickTrace(Randompos, Vector(0, 0, 9e9), ply).HitSky) and (Tries < 1000) do
-				Tries = Tries + 1
-				RandomMesh = Navmeshareas[math.random(#Navmeshareas)]
-				Randompos = RandomMesh:GetCenter()
-			end
-			SpawnPos = util.QuickTrace(Randompos, Vector(0, 0, 128)).HitPos - Vector(0, 0, 64)
-		end
+		ply:SetNoDraw(true)
+		ply:EnterVehicle(ply.BoxToEnter.Pod)
+		ply.BoxToEnter:SetNoDraw(false)
+		ply.BoxToEnter:GetPhysicsObject():EnableMotion(true)
+		timer.Simple(0.1, function()
+			ply.BoxToEnter:GetPhysicsObject():SetVelocity(-DropVelocity * 2)
+		end)
 
-		local DropPos = JMod.FindDropPosFromSignalOrigin(SpawnPos)
-		if DropPos and paraspawn:GetBool() then
-			ply:SetPos(DropPos)
-			ply:SetNoDraw(true)
-			local DropVelocity = VectorRand()
-			DropVelocity.z = 0
-			DropVelocity:Normalize()
-			DropVelocity = DropVelocity * 400
-			local Eff = EffectData()
-			Eff:SetOrigin(DropPos)
-			Eff:SetStart(DropVelocity)
-			util.Effect("eff_jack_gmod_jetflyby", Eff, true, true)
+		timer.Simple(1, function()
+			if not IsValid(ply) or not ply:Alive() or (ply:InVehicle()) then return end
+			
+			sound.Play("snd_jack_flyby_drop.mp3", DropPos, 150, 100)
 
-			timer.Simple(0.9, function()
-				if not IsValid(ply) or not ply:Alive() or (ply:InVehicle()) then return end
-				local Box = ents.Create("ent_jack_aidbox")
-				Box:SetPos(DropPos)
-				Box.InitialVel = -DropVelocity * 10
-				Box.Contents = {}
-				Box.NoFadeIn = true
-				Box:SetDTBool(0, "true")
-				Box:Spawn()
-				----- Create the chair
-				Box.Pod = ents.Create("prop_vehicle_prisoner_pod")
-				Box.Pod:SetModel("models/vehicles/prisoner_pod_inner.mdl")
-				local Ang, Up, Right, Forward = Box:GetAngles(), Box:GetUp(), Box:GetRight(), Box:GetForward()
-				Box.Pod:SetPos(Box:GetPos() - Up * 30)
-				Ang:RotateAroundAxis(Up, 0)
-				Ang:RotateAroundAxis(Forward, 0)
-				Box.Pod:SetAngles(Ang)
-				Box.Pod:Spawn()
-				Box.Pod:Activate()
-				Box.Pod:SetParent(Box)
-				Box.Pod:SetNoDraw(true)
-				Box.Pod:SetThirdPersonMode(true)
-				------
-				Box:SetPackageName(ply:Nick())
-				ply:EnterVehicle(Box.Pod)
-				---
-				sound.Play("snd_jack_flyby_drop.mp3", DropPos, 150, 100)
-
-				for k, playa in pairs(ents.FindInSphere(DropPos, 6000)) do
-					if playa:IsPlayer() then
-						sound.Play("snd_jack_flyby_drop.mp3", playa:GetShootPos(), 50, 100)
-					end
+			for k, playa in pairs(ents.FindInSphere(DropPos, 6000)) do
+				if playa:IsPlayer() then
+					sound.Play("snd_jack_flyby_drop.mp3", playa:GetShootPos(), 50, 100)
 				end
-			end)
-		end
-	end)
+			end
+		end)
+	end
 end)
