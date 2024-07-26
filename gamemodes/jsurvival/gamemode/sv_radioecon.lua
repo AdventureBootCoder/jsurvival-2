@@ -50,7 +50,7 @@ function GM:CalcJBuxWorth(item, amount)
 		end
 	elseif typToCheck == "table" then
 		for typ, amt in pairs(item) do
-			JBuxToGain = JBuxToGain + GM:CalcJBuxWorth(typ, amt)
+			JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(typ, amt)
 		end
 	end
 	return JBuxToGain, Exportables
@@ -245,7 +245,7 @@ hook.Add("JMod_OnRadioDeliver", "JSMOD_EXPORT_GOODS", function(stationID, dropPo
 		----
 		timer.Simple(15, function()
 			if IsValid(Heli) then
-				local JbuxToGain, Exportables = GM:CalcJBuxWorth(AvaliableResources)
+				local JbuxToGain, Exportables = GAMEMODE:CalcJBuxWorth(AvaliableResources)
 				
 				if (JBuxToGain > 0) and station.plyToCredit then
 					JSMod.SetJBux(station.plyToCredit, GAMEMODE:GetJBux(station.plyToCredit) + JBuxToGain)
@@ -261,7 +261,7 @@ hook.Add("JMod_OnRadioDeliver", "JSMOD_EXPORT_GOODS", function(stationID, dropPo
 			end
 		end)
 		return true
-	elseif DeliveryType == "fulton-export" then
+	end --[[elseif DeliveryType == "fulton-export" then
 		local GoodPackage = nil
 		for k, ent in pairs(ents.FindByClass("ent_aboot_jsmod_ezcrate_fulton")) do
 			if ent:GetClass() == "ent_aboot_jsmod_ezcrate_fulton" and IsValid(ent.Fulton) and ent.Fulton.ReadyForPickup then
@@ -316,7 +316,7 @@ hook.Add("JMod_OnRadioDeliver", "JSMOD_EXPORT_GOODS", function(stationID, dropPo
 			JMod.NotifyAllRadios(stationID, "drop failed")
 		end
 		return true
-	end
+	end--]]
 end)
 
 hook.Add("InitPostEntity", "JSMOD_SCROUNGEMOD", function()
@@ -347,14 +347,6 @@ local RequiredPackages = {
 		JBuxPrice = 200,
 		results = {
 			"npc_manhack",
-		}
-	},
-	["fulton-export"] = {
-		description = "Calls in plane to pick up resources from Fulton Crates.",
-		category = "JSurvival",
-		JBuxFree = true,
-		results = {
-			"ent_aboot_jsmod_ezcrate_fulton"
 		}
 	},
 	["fulton-crate"] = {

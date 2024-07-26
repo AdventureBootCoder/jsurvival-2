@@ -157,33 +157,92 @@ if SERVER then
 		end
 	end
 
-	--[[function ENT:OnFultonReady()
+	function ENT:OnFultonReady()
 		if self.PlaneComing then return end
-		self.PlaneComing = true
+		local PickupPos, PickupVelocity = self:GetPos() + Vector(0, 0, self.Fulton.DesiredAltitude), Vector(math.Rand(-1, 1), math.Rand(-1, 1), 0):GetNormalized()
+		local Tries = 0
+		local HitSky = false
+		local DirTr, OtherDirTr
+		while not(HitSky) and (Tries < 300) do
+			DirTr = util.TraceLine({start = PickupPos, endpos = PickupPos - (PickupVelocity * 9e9), filter = {self, self.Fulton}, mask = MASK_SOLID_BRUSHONLY})
+			OtherDirTr = util.TraceLine({start = PickupPos, endpos = PickupPos + (PickupVelocity * 9e9), filter = {self, self.Fulton}, mask = MASK_SOLID_BRUSHONLY})
+			if DirTr.HitSky and OtherDirTr.HitSky then
+				HitSky = true
+				self.PlaneComing = true
+				self:CallinFultonRecover(PickupPos, PickupVelocity)
+				return
+			else
+				Tries = Tries + 1
+				PickupVelocity = Vector(math.Rand(-1, 1), math.Rand(-1, 1), 0):GetNormalized()
+			end
+		end
+
+		self.Fulton:Collapse()
 	end--]]
 
+	function ENT:CallinFultonRecover(pos, dir)
+		local PickupPos, PickupVelocity = pos, dir
+		local CratePos = self:GetPos()
+		local CargoPlane = ents.Create("ent_aboot_jsmod_ezcargoplane")
+		CargoPlane:SetPos(PickupPos + Vector(0, 0, -50) + PickupVelocity * -800)
+		CargoPlane:SetAngles(PickupVelocity:Angle())
+		CargoPlane.FlightDir = PickupVelocity
+		CargoPlane:Spawn()
+
+		for _, ply in player.Iterator() do
+			if IsValid(ply) then
+				local Pos = ply:GetPos()
+				local Dist = Pos:Distance(PickupPos)
+				if Dist < 5000 then
+					local Direction = (Pos - PickupPos):GetNormalized()
+					sound.Play("@julton/cargo_plane_flyby_mono.wav", Pos + Vector(0, 0, 100), 160, 100, 1)
+				end
+			end
+		end
+
+		timer.Simple(10, function()
+			if not IsValid(self) or not IsValid(self.Fulton) or not IsValid(self.Cable) then return end
+			self.Fulton:SetPos(PickupPos)
+			self.Fulton:OnRecover(PickupVelocity * -2500)
+			--
+			self:GetPhysicsObject():EnableDrag(false)
+			self:GetPhysicsObject():EnableGravity(false)
+			self:GetPhysicsObject():SetVelocity(((self:GetPos() - CargoPlane:GetPos()):GetNormalized() * 1000))
+			sound.Play("ambient/machines/catapult_throw.wav", CratePos + Vector(0, 0, 100), 75, 60, 1)
+			timer.Simple(3, function()
+				if not IsValid(self) then return end
+				self:OnFultonRecover()
+			end)
+		end)
+	end
+
 	function ENT:OnFultonRecover()
+		if not self.PlaneComing then return end
 		local AvaliableResources = self.JModInv.EZresources
 
-		local JBuxToGain = JSMod.CalcJBuxWorth(AvaliableResources)
+		local JBuxToGain = GAMEMODE:CalcJBuxWorth(AvaliableResources)
 
 		if self.JModInv.EZitems and next(self.JModInv.EZitems) then
-			JBuxToGain = JBuxToGain + JSMod.CalcJBuxWorth(self.JModInv.Items)
+			JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(self.JModInv.Items)
 		end
 
 		local Owner = JMod.GetEZowner(self)
 		if (JBuxToGain > 0) and IsValid(Owner) then
-			JSMod.SetJBux(Owner, JSMod.GetJBux(Owner) + JBuxToGain)
+			GAMEMODE:SetJBux(Owner, GAMEMODE:GetJBux(Owner) + JBuxToGain)
 		end
 		SafeRemoveEntity(self)
 		SafeRemoveEntity(self.Fulton)
 	end
 
 	function ENT:Use(activator)
-		if (self:GetItemCount() <= 0) or IsValid(self.PlaneComing) then return end
+		if (self:GetItemCount() <= 0) or self.PlaneComing then return end
 		local Alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
 		if Alt then
-			self:ReleaseFulton(activator)
+			if IsValid(self.Fulton) then
+				self.Fulton:Collapse()
+			else
+				self:ReleaseFulton(activator)
+			end
 		else
 			net.Start("JMod_ItemInventory")
 			net.WriteEntity(self)
@@ -194,17 +253,23 @@ if SERVER then
 	end
 
 	function ENT:Think()
-		if IsValid(self.Fulton) and not IsValid(self.Cable) then
-			SafeRemoveEntity(self.Fulton)
-			self.Fulton = nil
-			self.PlaneComing = false
+		if IsValid(self.Fulton) then
+			if not IsValid(self.Cable) then
+				SafeRemoveEntity(self.Fulton)
+				self.Fulton = nil
+				self.PlaneComing = false
+			elseif self.Fulton.ReadyForPickup then
+				self:OnFultonReady()
+			end
 		end
 	end
 
-	--pfahahaha
 	function ENT:OnRemove()
+		if self.PlaneComing then
+			self:OnFultonRecover()
+		end
 	end
-	--aw fuck you
+
 elseif CLIENT then
 	local TxtCol = Color(10, 10, 10, 220)
 
