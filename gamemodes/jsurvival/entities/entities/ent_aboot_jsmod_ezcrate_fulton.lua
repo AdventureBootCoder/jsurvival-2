@@ -157,19 +157,40 @@ if SERVER then
 		end
 	end
 
+	local WeirdTextures = {
+		"TOOLS/TOOLSINVISIBLE"
+	}
+
+	local function CorrectForUnusualMaps(traceData)
+		local HitTexture = traceData.HitTexture
+		if table.HasValue(WeirdTextures, HitTexture) then
+			local NewStart = traceData.HitPos + traceData.Normal * 5
+			local NewTrace = util.TraceLine({start = NewStart, endpos = NewStart + (traceData.Normal * 9e9), filter = traceData.filter, mask = traceData.mask})
+			--debugoverlay.Line(NewStart, NewTrace.HitPos, 1, Color(255, 0, 0), true)
+
+			return NewTrace
+		end
+
+		return traceData
+	end
+
 	function ENT:OnFultonReady()
 		if self.PlaneComing then return end
 		local PickupPos, PickupVelocity = self:GetPos() + Vector(0, 0, self.Fulton.DesiredAltitude), Vector(math.Rand(-1, 1), math.Rand(-1, 1), 0):GetNormalized()
 		local Tries = 0
-		local HitSky = false
+		local ClearPath = false
 		local DirTr, OtherDirTr
-		while not(HitSky) and (Tries < 300) do
-			DirTr = util.TraceLine({start = PickupPos, endpos = PickupPos - (PickupVelocity * 9e9), filter = {self, self.Fulton}, mask = MASK_SOLID_BRUSHONLY})
-			OtherDirTr = util.TraceLine({start = PickupPos, endpos = PickupPos + (PickupVelocity * 9e9), filter = {self, self.Fulton}, mask = MASK_SOLID_BRUSHONLY})
+		while not(ClearPath) and (Tries < 300) do
+			DirTr = CorrectForUnusualMaps(util.TraceLine({start = PickupPos, endpos = PickupPos - (PickupVelocity * 9e9), filter = {self, self.Fulton}, mask = MASK_SOLID_BRUSHONLY}))
+			OtherDirTr = CorrectForUnusualMaps(util.TraceLine({start = PickupPos, endpos = PickupPos + (PickupVelocity * 9e9), filter = {self, self.Fulton}, mask = MASK_SOLID_BRUSHONLY}))
+			--print(Tries, DirTr.HitTexture, OtherDirTr.HitTexture)
+			--debugoverlay.Line(PickupPos, PickupPos + (PickupVelocity * 9e9), 2, Color(217, 255, 0), true)
+
 			if DirTr.HitSky and OtherDirTr.HitSky then
-				HitSky = true
+				ClearPath = true
 				self.PlaneComing = true
 				self:CallinFultonRecover(PickupPos, PickupVelocity)
+
 				return
 			else
 				Tries = Tries + 1
@@ -255,11 +276,9 @@ if SERVER then
 	function ENT:Think()
 		if IsValid(self.Fulton) then
 			if not IsValid(self.Cable) then
-				SafeRemoveEntity(self.Fulton)
+				self.Fulton:Collapse()
 				self.Fulton = nil
 				self.PlaneComing = false
-			elseif self.Fulton.ReadyForPickup then
-				self:OnFultonReady()
 			end
 		end
 	end

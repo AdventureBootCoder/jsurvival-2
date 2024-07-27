@@ -53,8 +53,9 @@ if SERVER then
 				end
 			else
 				self.CurrentAltitude = (self:GetPos().z - self.AttachedCargo:GetPos().z)
-				if (self.CurrentAltitude >= self.DesiredAltitude) then
+				if not self.ReadyForPickup and (self.CurrentAltitude >= self.DesiredAltitude) then
 					self.ReadyForPickup = true
+					self.AttachedCargo:OnFultonReady(self)
 				end
 				JMod.AeroDrag(self, Up, 10, 10)
 				Phys:ApplyForceOffset(Vector(0, 0, 100 * Inflated), self:GetPos() + Up * 100)
