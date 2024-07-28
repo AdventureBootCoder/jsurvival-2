@@ -157,13 +157,13 @@ if SERVER then
 		end
 	end
 
-	local WeirdTextures = {
+	local ClipTextures = {
 		"TOOLS/TOOLSINVISIBLE"
 	}
 
-	local function CorrectForUnusualMaps(traceData)
+	local function CheckForMapClip(traceData)
 		local HitTexture = traceData.HitTexture
-		if table.HasValue(WeirdTextures, HitTexture) then
+		if table.HasValue(ClipTextures, HitTexture) then
 			local NewStart = traceData.HitPos + traceData.Normal * 5
 			local NewTrace = util.TraceLine({start = NewStart, endpos = NewStart + (traceData.Normal * 9e9), filter = traceData.filter, mask = traceData.mask})
 			--debugoverlay.Line(NewStart, NewTrace.HitPos, 1, Color(255, 0, 0), true)
@@ -181,8 +181,8 @@ if SERVER then
 		local ClearPath = false
 		local DirTr, OtherDirTr
 		while not(ClearPath) and (Tries < 300) do
-			DirTr = CorrectForUnusualMaps(util.TraceLine({start = PickupPos, endpos = PickupPos - (PickupVelocity * 9e9), filter = {self, self.Fulton}, mask = MASK_SOLID_BRUSHONLY}))
-			OtherDirTr = CorrectForUnusualMaps(util.TraceLine({start = PickupPos, endpos = PickupPos + (PickupVelocity * 9e9), filter = {self, self.Fulton}, mask = MASK_SOLID_BRUSHONLY}))
+			DirTr = CheckForMapClip(util.TraceLine({start = PickupPos, endpos = PickupPos - (PickupVelocity * 9e9), filter = {self, self.Fulton}, mask = MASK_SOLID_BRUSHONLY}))
+			OtherDirTr = CheckForMapClip(util.TraceLine({start = PickupPos, endpos = PickupPos + (PickupVelocity * 9e9), filter = {self, self.Fulton}, mask = MASK_SOLID_BRUSHONLY}))
 			--print(Tries, DirTr.HitTexture, OtherDirTr.HitTexture)
 			--debugoverlay.Line(PickupPos, PickupPos + (PickupVelocity * 9e9), 2, Color(217, 255, 0), true)
 
@@ -205,7 +205,7 @@ if SERVER then
 		local PickupPos, PickupVelocity = pos, dir
 		local CratePos = self:GetPos()
 		local CargoPlane = ents.Create("ent_aboot_jsmod_ezcargoplane")
-		CargoPlane:SetPos(PickupPos + Vector(0, 0, -50) + PickupVelocity * -800)
+		CargoPlane:SetPos(PickupPos)--PickupPos + Vector(0, 0, -50) + PickupVelocity * -800)
 		CargoPlane:SetAngles(PickupVelocity:Angle())
 		CargoPlane.FlightDir = PickupVelocity
 		CargoPlane:Spawn()
@@ -223,6 +223,7 @@ if SERVER then
 
 		timer.Simple(10, function()
 			if not IsValid(self) or not IsValid(self.Fulton) or not IsValid(self.Cable) then return end
+			if PickupPos:Distance(self.Fulton:GetPos()) > 500 then return end
 			self.Fulton:SetPos(PickupPos)
 			self.Fulton:OnRecover(PickupVelocity * -2500)
 			--
@@ -238,7 +239,7 @@ if SERVER then
 	end
 
 	function ENT:OnFultonRecover()
-		if not self.PlaneComing then return end
+		if self.Recovered then return end
 		local AvaliableResources = self.JModInv.EZresources
 
 		local JBuxToGain = GAMEMODE:CalcJBuxWorth(AvaliableResources)
@@ -253,6 +254,8 @@ if SERVER then
 		end
 		SafeRemoveEntity(self)
 		SafeRemoveEntity(self.Fulton)
+
+		self.Recovered = true
 	end
 
 	function ENT:Use(activator)
@@ -285,7 +288,7 @@ if SERVER then
 
 	function ENT:OnRemove()
 		if self.PlaneComing then
-			self:OnFultonRecover()
+			--self:OnFultonRecover()
 		end
 	end
 

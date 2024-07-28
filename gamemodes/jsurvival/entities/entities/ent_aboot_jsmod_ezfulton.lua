@@ -30,7 +30,7 @@ if SERVER then
 			Phys:SetMaterial("cloth")
 		end
 		self.Durability = 100
-		self.DesiredAltitude = self.DesiredAltitude or 1000
+		self.DesiredAltitude = self.DesiredAltitude or 3000
 		self.CurrentAltitude = 0
 		self.AttachedCargo = self.AttachedCargo or nil
 		self:SetInflation(0)

@@ -96,7 +96,7 @@ elseif CLIENT then
 			local Pos = self:GetRenderPos()
 			self:SetRenderOrigin(Pos)
 		else
-			self:SetRenderOrigin(Pos)
+			self:SetRenderOrigin(vector_zero)
 		end
 		--
 		self:DrawModel()
