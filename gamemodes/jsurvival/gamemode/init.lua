@@ -5,6 +5,7 @@ AddCSLuaFile("shared.lua")
 include("shared.lua")
 include("spawns.lua")
 include("sv_radioecon.lua") -- This is server only stuff
+include("sh_econ.lua")
 resource.AddWorkshop("1919689921")
 function GM:Initialize()
 end

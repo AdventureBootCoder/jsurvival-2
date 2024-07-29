@@ -1,6 +1,5 @@
 include("shared.lua")
 
-
 local VignetteMat = Material("mats_jack_gmod_sprites/hard_vignette.png")
 local OldHealth, NewHealth = -1, -1
 local SmoothTime = 0.5

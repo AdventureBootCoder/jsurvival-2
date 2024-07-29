@@ -29,6 +29,7 @@ if SERVER then
 	end
 
 	function ENT:Initialize()
+		--self:AddEFlags(EFL_IN_SKYBOX)
 		self:SetModel("models/jsurvival/jargoplane.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_NONE)
@@ -72,6 +73,8 @@ if SERVER then
 		else
 			self:SetManualRender(false)
 			self:SetPos(Pos)
+			debugoverlay.Cross(Pos, 10, 2, Color(255, 0, 0), true)
+			jprint(self:IsDormant())
 		end
 		self:SetAngles(self.FlightAng)
 
@@ -92,11 +95,11 @@ elseif CLIENT then
 	local RedLight, GreenLight = Color(255, 21, 21), Color(29, 255, 21)
 	function ENT:Draw()
 		local Time = CurTime()
+		local Pos = self:GetRenderPos()
 		if self:GetManualRender() then
-			local Pos = self:GetRenderPos()
 			self:SetRenderOrigin(Pos)
 		else
-			self:SetRenderOrigin(vector_zero)
+			self:SetRenderOrigin(nil)
 		end
 		--
 		self:DrawModel()

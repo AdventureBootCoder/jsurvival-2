@@ -77,7 +77,7 @@ if SERVER then
 		local ent = data.HitEntity
 
 		local Phys = ent:GetPhysicsObject()
-		if IsValid(Phys) then
+		if IsValid(ent) and IsValid(Phys) then
 			local Vol = Phys:GetVolume() or (ent.GetEZResource and ent:GetEZResource())
 			if Vol ~= nil then
 
@@ -229,7 +229,7 @@ if SERVER then
 			--
 			self:GetPhysicsObject():EnableDrag(false)
 			self:GetPhysicsObject():EnableGravity(false)
-			self:GetPhysicsObject():SetVelocity(((self:GetPos() - CargoPlane:GetPos()):GetNormalized() * 1000))
+			self:GetPhysicsObject():SetVelocity(((self:GetPos() - CargoPlane:GetPos()):GetNormalized() * 5000))
 			sound.Play("ambient/machines/catapult_throw.wav", CratePos + Vector(0, 0, 100), 75, 60, 1)
 			timer.Simple(3, function()
 				if not IsValid(self) then return end
