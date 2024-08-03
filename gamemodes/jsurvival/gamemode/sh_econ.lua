@@ -32,6 +32,7 @@ JSMod.ItemToJBux = {
 }
 JSMod.CurrentResourcePrices = table.FullCopy(JSMod.ResourceToJBux)
 JSMod.JBuxList = JSMod.JBuxList or {}
+local color_orange = Color(255, 136, 0)
 
 function GM:GetJBux(ply)
 	local JBuckaroos = JSMod.JBuxList[ply:SteamID()]
