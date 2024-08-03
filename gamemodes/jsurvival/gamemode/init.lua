@@ -21,7 +21,7 @@ hook.Add("PlayerInitialSpawn", "JS_INITIAL_PLAYERSPAWN", function(ply)
             BetterChatPrint(ply, "To enable some useful features for improving realism gameplay.", color_yellow)
         end
     end)
-    JSMod.JBuxListInfo(ply)
+   	JSMod.JBuxListInfo(ply)
     if ply:GetPData("JBux") then GAMEMODE:SetJBux(ply, ply:GetPData("JBux"), false) end
 end)
 

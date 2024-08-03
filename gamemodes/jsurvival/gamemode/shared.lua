@@ -10,7 +10,6 @@ hook.Add("PlayerNoClip", "js-noclip", function(ply, desiredState)
 
 	return false
 end)
-local color_orange = Color(255, 136, 0)
 
 JSMod.JBuxList = JSMod.JBuxList or {}
 
@@ -32,5 +31,5 @@ if SERVER then
     end
 elseif CLIENT then
     net.Receive("betterchatprint", function() chat.AddText(net.ReadColor(), net.ReadString()) end)
-    net.Receive("jbuxlist", function(ply) JSMod.JBuxList = net.WriteTable() PrintTable(JSMod.JBuxList)end)
+    net.Receive("jbuxlist", function(ply) JSMod.JBuxList = net.ReadTable() end)
 end
