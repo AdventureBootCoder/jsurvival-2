@@ -21,7 +21,7 @@ JSMod.ResourceToJBux = {
 	[JMod.EZ_RESOURCE_TYPES.DIAMOND] = 100,
 	[JMod.EZ_RESOURCE_TYPES.PLATINUM] = 150,
 	[JMod.EZ_RESOURCE_TYPES.ANTIMATTER] = 1000,
-    [JMod.EZ_RESOURCE_TYPES.TUNGSTEN] = 3
+	[JMod.EZ_RESOURCE_TYPES.TUNGSTEN] = 3
 }
 JSMod.ItemToJBux = {
 	["ent_jack_gmod_ezanomaly_gnome"] = 10000,
@@ -56,8 +56,8 @@ function GM:SetJBux(ply, amt, silent)
 	elseif (NewAmt > OldAmt) then
 		BetterChatPrint(ply, "You have gained ".. tostring(amt - OldAmt) .." JBux!", color_orange)
 	end
-    
 end
+
 function GM:CalcJBuxWorth(item, amount)
 	if not(item) then return 0 end
 	amount = amount or 1
@@ -83,6 +83,7 @@ function GM:CalcJBuxWorth(item, amount)
 	end
 	return JBuxToGain, Exportables
 end
+
 function GM:CalcJBuxWorth(item, amount)
 	if not(item) then return 0 end
 	amount = amount or 1
