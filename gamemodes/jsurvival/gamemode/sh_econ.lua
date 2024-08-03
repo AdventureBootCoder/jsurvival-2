@@ -20,7 +20,8 @@ JSMod.ResourceToJBux = {
 	[JMod.EZ_RESOURCE_TYPES.SILVER] = 15,
 	[JMod.EZ_RESOURCE_TYPES.DIAMOND] = 100,
 	[JMod.EZ_RESOURCE_TYPES.PLATINUM] = 150,
-	[JMod.EZ_RESOURCE_TYPES.ANTIMATTER] = 1000
+	[JMod.EZ_RESOURCE_TYPES.ANTIMATTER] = 1000,
+    [JMod.EZ_RESOURCE_TYPES.TUNGSTEN] = 3
 }
 JSMod.ItemToJBux = {
 	["ent_jack_gmod_ezanomaly_gnome"] = 10000,
@@ -32,6 +33,55 @@ JSMod.ItemToJBux = {
 JSMod.CurrentResourcePrices = table.FullCopy(JSMod.ResourceToJBux)
 JSMod.JBuxList = JSMod.JBuxList or {}
 
+function GM:GetJBux(ply)
+	local JBuckaroos = JSMod.JBuxList[ply:SteamID()]
+	if not JBuckaroos then
+		JSMod.JBuxList[ply:SteamID()] = 0
+		return 0
+	end
+	return JBuckaroos
+end
+
+function GM:SetJBux(ply, amt, silent)
+	if not(IsValid(ply)) then return end
+	local OldAmt = GAMEMODE:GetJBux(ply)
+	local NewAmt = math.floor(amt)
+	JSMod.JBuxList[ply:SteamID()] = NewAmt
+	ply:SetPData("JBux", NewAmt)
+	if silent then return end
+
+	if (NewAmt < OldAmt) then
+		BetterChatPrint(ply, "That cost you ".. tostring(OldAmt - amt) .." JBux!", color_orange)
+	elseif (NewAmt > OldAmt) then
+		BetterChatPrint(ply, "You have gained ".. tostring(amt - OldAmt) .." JBux!", color_orange)
+	end
+    
+end
+function GM:CalcJBuxWorth(item, amount)
+	if not(item) then return 0 end
+	amount = amount or 1
+
+	local typToCheck = type(item)
+	local JBuxToGain = 0
+	local Exportables = {}
+
+	if typToCheck == "Entity" then
+		if IsValid(item) and JSMod.ItemToJBux[item:GetClass()] then
+			JBuxToGain = JSMod.ItemToJBux[item:GetClass()] * amount
+		end
+	elseif typToCheck == "string" then
+		if JSMod.CurrentResourcePrices[item] then
+			JBuxToGain = JSMod.CurrentResourcePrices[item] * amount
+		elseif JSMod.ItemToJBux[item] then
+			JBuxToGain = JSMod.ItemToJBux[item] * amount
+		end
+	elseif typToCheck == "table" then
+		for typ, amt in pairs(item) do
+			JBuxToGain = JBuxToGain + GM:CalcJBuxWorth(typ, amt)
+		end
+	end
+	return JBuxToGain, Exportables
+end
 function GM:CalcJBuxWorth(item, amount)
 	if not(item) then return 0 end
 	amount = amount or 1

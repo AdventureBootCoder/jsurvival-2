@@ -18,12 +18,12 @@ concommand.Add("js_jbux_donate", function(ply, cmd, args)
 	end
 
 	if (recipient) and (recipient:Alive()) then 
-		JSMod.SetJBux(recipient, GAMEMODE:GetJBux(recipient) + amt, true)
+		GAMEMODE:SetJBux(recipient, GAMEMODE:GetJBux(recipient) + amt, true)
 		BetterChatPrint(recipient, "You got ".. tostring(amt) .." JBux!", color_orange)
 		BetterChatPrint(ply, "You donated ".. tostring(amt) .." JBux!", color_orange)
 	elseif string.lower(target) == "team" then
 		recipient = ply:Team()
-		JSMod.SetJBux(recipient, GAMEMODE:GetJBux(recipient) + amt, true)
+		GAMEMODE:SetJBux(recipient, GAMEMODE:GetJBux(recipient) + amt, true)
 		BetterChatPrint(ply, "You donated ".. tostring(amt) .." JBux!", color_orange)
 	end
 end, "Donates JBux to someone or your team")
@@ -127,7 +127,7 @@ hook.Add("JMod_OnRadioDeliver", "JSMOD_EXPORT_GOODS", function(stationID, dropPo
 				local JbuxToGain, Exportables = GAMEMODE:CalcJBuxWorth(AvaliableResources)
 				
 				if (JBuxToGain > 0) and station.plyToCredit then
-					JSMod.SetJBux(station.plyToCredit, GAMEMODE:GetJBux(station.plyToCredit) + JBuxToGain)
+					GAMEMODE:SetJBux(station.plyToCredit, GAMEMODE:GetJBux(station.plyToCredit) + JBuxToGain)
 					JMod.ConsumeResourcesInRange(Exportables, ExportPos, 200, nil, false)
 					station.plyToCredit = nil
 				end
