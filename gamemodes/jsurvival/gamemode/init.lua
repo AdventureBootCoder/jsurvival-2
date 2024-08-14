@@ -124,4 +124,11 @@ if SERVER then
 			return false
 		end
 	end
+	function GM:CanProperty( ply, property, ent)
+		if JMod.IsAdmin(ply) then 
+			return true 
+		else
+			return false
+		end
+	end
 end
