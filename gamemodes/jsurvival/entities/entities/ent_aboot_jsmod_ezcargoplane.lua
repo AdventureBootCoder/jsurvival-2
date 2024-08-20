@@ -22,19 +22,22 @@ if SERVER then
 		JMod.SetEZowner(ent, ply)
 		ent:Spawn()
 		ent:Activate()
-		JMod.Hint(ply, self.ClassName)
 		sound.Play("@julton/cargo_plane_flyby_mono.wav", ply:GetPos(), 160, 100, 1)
 
 		return ent
 	end
 
+	function ENT:UpdateTransmitState()
+		return TRANSMIT_ALWAYS
+	end
+
 	function ENT:Initialize()
-		--self:AddEFlags(EFL_IN_SKYBOX)
 		self:SetModel("models/jsurvival/jargoplane.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_NONE)
 		self:SetSolid(SOLID_NONE)
 		self:DrawShadow(false)
+		self:AddEFlags(EFL_IN_SKYBOX)
 	
 		self.PickupPos = self.PickupPos or self:GetPos()
 		self.FlightDir = self.FlightDir or Vector(math.random(-1, 1), math.random(-1, 1), 0):GetNormalized()
@@ -53,7 +56,7 @@ if SERVER then
 		timer.Simple(0, function() 
 			if IsValid(self) and IsValid(Phys) then
 				Phys:SetMass(50000)
-				Phys:EnableMotion(false) 
+				--Phys:EnableMotion(false) 
 			end 
 		end)
 	end
@@ -62,33 +65,43 @@ if SERVER then
 		local Time = CurTime()
 		local TimeLeft = self.DieTime - Time
 		if TimeLeft <= 0 then self:Remove() return false end
+		PlayerFilter = RecipientFilter()
+		PlayerFilter:AddAllPlayers()
+		self:SetPreventTransmit(PlayerFilter, false)
 
 		local Frac = ((self.DieTime - Time) / self.LifeTime) - .5
 		local Pos = self.PickupPos + self.TotalDistance * Frac
 		
 		local Boundry = util.TraceLine({start = self.PickupPos, endpos = Pos, filter = self, mask = MASK_SOLID_BRUSHONLY})
-		if Boundry.HitSky and not(util.IsInWorld(Pos)) then
+		if Boundry.HitSky or not(util.IsInWorld(Pos)) then
 			self:SetManualRender(true)
 			self:SetRenderPos(Pos)
+			--self:SetPos(Boundry.HitPos - Boundry.Normal)
 		else
 			self:SetManualRender(false)
 			self:SetPos(Pos)
-			debugoverlay.Cross(Pos, 10, 2, Color(255, 0, 0), true)
-			jprint(self:IsDormant())
+			--self:SetPos(Boundry.HitPos - Boundry.Normal)
 		end
 		self:SetAngles(self.FlightAng)
+		--debugoverlay.Line(self.PickupPos, Pos, 1, Color(0, 247, 255), true)
+		debugoverlay.Cross(self:GetPos(), 10, 1, Color(0, 255, 221), true)
 
-		self:NextThink(Time + 0.01)
+		self:NextThink(Time)
 		return true
 	end
 
 elseif CLIENT then
 	function ENT:Initialize()
-		--self:SetModel("models/jsurvival/jargoplane.mdl")
-		self:DrawShadow(false)
+		--[[self:SetModel("models/jsurvival/jargoplane.mdl")
+		self:PhysicsInit(SOLID_VPHYSICS)
+		self:SetMoveType(MOVETYPE_NONE)
+		self:SetSolid(SOLID_NONE)--]]
+		--self:DrawShadow(false)
+		--self:AddEFlags(EFL_IN_SKYBOX)
 	end
 
 	function ENT:Think()
+		--print(self:GetManualRender(), self:GetRenderPos())
 	end
 
 	local GlowSprite = Material("sprites/mat_jack_basicglow")
@@ -101,6 +114,8 @@ elseif CLIENT then
 		else
 			self:SetRenderOrigin(nil)
 		end
+		//print(self:GetManualRender(), self:GetRenderPos())
+		--debugoverlay.Cross(self:GetPos(), 10, 2, Color(255, 251, 0), true)
 		--
 		self:DrawModel()
 		--

@@ -22,7 +22,9 @@ if SERVER then
 		net.WriteString(msg)
 		net.Send(ply)
 	end
+	
 	util.AddNetworkString("jbuxlist")
+
 	function JSMod.JBuxListInfo(ply)
 		net.Start("jbuxlist")
 		net.WriteTable(JSMod.JBuxList)
