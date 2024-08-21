@@ -84,32 +84,6 @@ function GM:CalcJBuxWorth(item, amount)
 	return JBuxToGain, Exportables
 end
 
-function GM:CalcJBuxWorth(item, amount)
-	if not(item) then return 0 end
-	amount = amount or 1
-
-	local typToCheck = type(item)
-	local JBuxToGain = 0
-	local Exportables = {}
-
-	if typToCheck == "Entity" then
-		if IsValid(item) and JSMod.ItemToJBux[item:GetClass()] then
-			JBuxToGain = JSMod.ItemToJBux[item:GetClass()] * amount
-		end
-	elseif typToCheck == "string" then
-		if JSMod.CurrentResourcePrices[item] then
-			JBuxToGain = JSMod.CurrentResourcePrices[item] * amount
-		elseif JSMod.ItemToJBux[item] then
-			JBuxToGain = JSMod.ItemToJBux[item] * amount
-		end
-	elseif typToCheck == "table" then
-		for typ, amt in pairs(item) do
-			JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(typ, amt)
-		end
-	end
-	return JBuxToGain, Exportables
-end
-
 local function FindItemJBuxPrice(item)
 	for pkg, info in pairs(JMod.Config.RadioSpecs.AvailablePackages) do
 		if info.JBuxPrice and (isstring(info.results) and info.results == item) or (info.results[1] == item) then
