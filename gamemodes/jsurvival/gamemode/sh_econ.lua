@@ -78,7 +78,7 @@ function GM:CalcJBuxWorth(item, amount)
 		end
 	elseif typToCheck == "table" then
 		for typ, amt in pairs(item) do
-			JBuxToGain = JBuxToGain + GM:CalcJBuxWorth(typ, amt)
+			JBuxToGain = JBuxToGain + GAMEMODe:CalcJBuxWorth(typ, amt)
 		end
 	end
 	return JBuxToGain, Exportables
