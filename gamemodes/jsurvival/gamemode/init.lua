@@ -131,4 +131,9 @@ if SERVER then
 			return false
 		end
 	end
+	function GM:PlayerUse(ply, ent)
+        if ent.EZradio == true then
+            JSMod.JBuxListInfo(ply)
+       	end
+    end
 end
