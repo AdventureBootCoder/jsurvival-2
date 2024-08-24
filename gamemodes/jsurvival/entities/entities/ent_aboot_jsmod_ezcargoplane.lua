@@ -36,8 +36,8 @@ if SERVER then
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_NONE)
 		self:SetSolid(SOLID_NONE)
-		self:DrawShadow(false)
-		self:AddEFlags(EFL_IN_SKYBOX)
+		--self:DrawShadow(true)
+		--self:AddEFlags(EFL_IN_SKYBOX)
 	
 		self.PickupPos = self.PickupPos or self:GetPos()
 		self.FlightDir = self.FlightDir or Vector(math.random(-1, 1), math.random(-1, 1), 0):GetNormalized()
@@ -76,11 +76,10 @@ if SERVER then
 		if Boundry.HitSky or not(util.IsInWorld(Pos)) then
 			self:SetManualRender(true)
 			self:SetRenderPos(Pos)
-			--self:SetPos(Boundry.HitPos - Boundry.Normal)
+			self:SetPos(Boundry.HitPos + Boundry.Normal)
 		else
 			self:SetManualRender(false)
-			self:SetPos(Pos)
-			--self:SetPos(Boundry.HitPos - Boundry.Normal)
+			self:SetPos(Boundry.HitPos + Boundry.Normal)
 		end
 		self:SetAngles(self.FlightAng)
 		--debugoverlay.Line(self.PickupPos, Pos, 1, Color(0, 247, 255), true)
@@ -92,16 +91,16 @@ if SERVER then
 
 elseif CLIENT then
 	function ENT:Initialize()
-		--[[self:SetModel("models/jsurvival/jargoplane.mdl")
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_NONE)
-		self:SetSolid(SOLID_NONE)--]]
-		--self:DrawShadow(false)
 		--self:AddEFlags(EFL_IN_SKYBOX)
 	end
 
 	function ENT:Think()
-		--print(self:GetManualRender(), self:GetRenderPos())
+		print(self:GetNoDraw(), self:GetManualRender(), self:GetRenderPos())
+
+		if (self:GetNoDraw() == false) then self:Draw() end
+
+		self:NextThink(CurTime())
+		return true
 	end
 
 	local GlowSprite = Material("sprites/mat_jack_basicglow")
@@ -111,12 +110,14 @@ elseif CLIENT then
 		local Pos = self:GetRenderPos()
 		if self:GetManualRender() then
 			self:SetRenderOrigin(Pos)
+			--render.SetLightingOrigin(self:GetPos())
 		else
 			self:SetRenderOrigin(nil)
 		end
 		//print(self:GetManualRender(), self:GetRenderPos())
 		--debugoverlay.Cross(self:GetPos(), 10, 2, Color(255, 251, 0), true)
 		--
+		self:DrawShadow(true)
 		self:DrawModel()
 		--
 		local SelfAng = self:GetAngles() 
