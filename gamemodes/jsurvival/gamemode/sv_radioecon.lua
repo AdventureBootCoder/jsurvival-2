@@ -77,7 +77,7 @@ hook.Add("JMod_CanRadioRequest", "JSMOD_MONEY_CHECK", function(ply, transceiver,
 
 	local PackageSpecs = JMod.Config.RadioSpecs.AvailablePackages[pkg]
 	if not(PackageSpecs) then return end
-	local ReqAmount = PackageSpecs.JBuxPrice or GAMEMODE:AutoCalcPrice(PackageSpecs.results, false)
+	local ReqAmount = PackageSpecs.JBuxPrice or GAMEMODE:AutoCalcPackagePrice(PackageSpecs.results, false)
 	if string.find(pkg, "-export") then
 		station.plyToCredit = ply
 	end
