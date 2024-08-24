@@ -3,13 +3,17 @@ JSMod = JSMod or {}
 JSMod.ResourceToJBux = {
 	[JMod.EZ_RESOURCE_TYPES.BASICPARTS] = 4,
 	[JMod.EZ_RESOURCE_TYPES.PRECISIONPARTS] = 10,
+	[JMod.EZ_RESOURCE_TYPES.ADVANCEDPARTS] = 400,
 	[JMod.EZ_RESOURCE_TYPES.OIL] = .75,
 	[JMod.EZ_RESOURCE_TYPES.RUBBER] = .5,
 	[JMod.EZ_RESOURCE_TYPES.ORGANICS] = .25,
 	[JMod.EZ_RESOURCE_TYPES.WOOD] = .1,
+	[JMod.EZ_RESOURCE_TYPES.PAPER] = .25,
 	[JMod.EZ_RESOURCE_TYPES.PLASTIC] = .3,
+	[JMod.EZ_RESOURCE_TYPES.GLASS] = .5,
 	[JMod.EZ_RESOURCE_TYPES.FUEL] = .6,
 	[JMod.EZ_RESOURCE_TYPES.CHEMICALS] = 1,
+	[JMod.EZ_RESOURCE_TYPES.EXPLOSIVES] = 3,
 	[JMod.EZ_RESOURCE_TYPES.STEEL] = .4,
 	[JMod.EZ_RESOURCE_TYPES.LEAD] = .4,
 	[JMod.EZ_RESOURCE_TYPES.ALUMINUM] = .5,
@@ -58,9 +62,11 @@ function GM:SetJBux(ply, amt, silent)
 	end
 end
 
-function GM:CalcJBuxWorth(item, amount)
+function GM:CalcJBuxWorth(item, amount, curDepth)
 	if not(item) then return 0 end
 	amount = amount or 1
+
+	if curDepth and curDepth > 5 then return 0 end
 
 	local typToCheck = type(item)
 	local JBuxToGain = 0
@@ -69,6 +75,7 @@ function GM:CalcJBuxWorth(item, amount)
 	if typToCheck == "Entity" then
 		if IsValid(item) and JSMod.ItemToJBux[item:GetClass()] then
 			JBuxToGain = JSMod.ItemToJBux[item:GetClass()] * amount
+			table.insert(Exportables, item)
 		end
 	elseif typToCheck == "string" then
 		if JSMod.CurrentResourcePrices[item] then
@@ -78,56 +85,31 @@ function GM:CalcJBuxWorth(item, amount)
 		end
 	elseif typToCheck == "table" then
 		for typ, amt in pairs(item) do
-			JBuxToGain = JBuxToGain + GM:CalcJBuxWorth(typ, amt)
+			JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(typ, amt, (curDepth or 0) + 1)
 		end
 	end
 	return JBuxToGain, Exportables
 end
 
-function GM:CalcJBuxWorth(item, amount)
-	if not(item) then return 0 end
-	amount = amount or 1
-
-	local typToCheck = type(item)
-	local JBuxToGain = 0
-	local Exportables = {}
-
-	if typToCheck == "Entity" then
-		if IsValid(item) and JSMod.ItemToJBux[item:GetClass()] then
-			JBuxToGain = JSMod.ItemToJBux[item:GetClass()] * amount
-		end
-	elseif typToCheck == "string" then
-		if JSMod.CurrentResourcePrices[item] then
-			JBuxToGain = JSMod.CurrentResourcePrices[item] * amount
-		elseif JSMod.ItemToJBux[item] then
-			JBuxToGain = JSMod.ItemToJBux[item] * amount
-		end
-	elseif typToCheck == "table" then
-		for typ, amt in pairs(item) do
-			JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(typ, amt)
-		end
-	end
-	return JBuxToGain, Exportables
-end
-
-local function FindItemJBuxPrice(item)
+local function FindPackagePrice(item)
+	local price = 0
 	for pkg, info in pairs(JMod.Config.RadioSpecs.AvailablePackages) do
 		if info.JBuxPrice and (isstring(info.results) and info.results == item) or (info.results[1] == item) then
 			price = info.JBuxPrice
 
-			return price
+			break
 		end
 	end
 
-	return 0
+	return price
 end
 
-function GM:AutoCalcPrice(contents, searchRadioManifest)
+function GM:AutoCalcPackagePrice(contents, searchRadioManifest)
 	local typ = type(contents)
 	local price = 0
 
 	if typ == "string" then
-		local RadioPrice = (searchRadioManifest and FindItemJBuxPrice(contents)) or 0
+		local RadioPrice = (searchRadioManifest and FindPackagePrice(contents)) or 0
 		if RadioPrice <= 0 and JSMod.ItemToJBux[contents] then
 			price = JSMod.ItemToJBux[contents]
 		else
@@ -140,7 +122,7 @@ function GM:AutoCalcPrice(contents, searchRadioManifest)
 			typ = type(v)
 
 			if typ == "string" then
-				local RadioPrice = (searchRadioManifest and FindItemJBuxPrice(v)) or 0
+				local RadioPrice = (searchRadioManifest and FindPackagePrice(v)) or 0
 				if RadioPrice <= 0 and JSMod.ItemToJBux[v] then
 					price = price + JSMod.ItemToJBux[v]
 				else
