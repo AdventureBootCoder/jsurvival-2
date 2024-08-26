@@ -246,16 +246,19 @@ if SERVER then
 
 		if self.JModInv.EZitems and next(self.JModInv.EZitems) then
 			JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(self.JModInv.Items)
+			for k, v in pairs(self.JModInv.EZitems) do
+				SafeRemoveEntity(v.ent)
+			end
 		end
+		self.JModInv = {} -- Make sure there's absolutely no double dipping
 
 		local Owner = JMod.GetEZowner(self)
 		if (JBuxToGain > 0) and IsValid(Owner) then
 			GAMEMODE:SetJBux(Owner, GAMEMODE:GetJBux(Owner) + JBuxToGain)
 		end
+		self.Recovered = true
 		SafeRemoveEntity(self)
 		SafeRemoveEntity(self.Fulton)
-
-		self.Recovered = true
 	end
 
 	function ENT:Use(activator)
