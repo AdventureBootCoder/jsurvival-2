@@ -95,7 +95,7 @@ elseif CLIENT then
 	end
 
 	function ENT:Think()
-		print(self:GetNoDraw(), self:GetManualRender(), self:GetRenderPos())
+		--print(self:GetNoDraw(), self:GetManualRender(), self:GetRenderPos())
 
 		if (self:GetNoDraw() == false) then self:Draw() end
 
@@ -114,7 +114,7 @@ elseif CLIENT then
 		else
 			self:SetRenderOrigin(nil)
 		end
-		//print(self:GetManualRender(), self:GetRenderPos())
+		--print(self:GetManualRender(), self:GetRenderPos())
 		--debugoverlay.Cross(self:GetPos(), 10, 2, Color(255, 251, 0), true)
 		--
 		self:DrawShadow(true)
