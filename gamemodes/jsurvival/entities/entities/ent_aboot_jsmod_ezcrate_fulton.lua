@@ -303,6 +303,13 @@ elseif CLIENT then
 		self.FultonBox = JMod.MakeModel(self, "models/props_junk/cardboard_box002a.mdl", nil)
 	end
 
+	function ENT:Use(activator)
+		if (self:GetItemCount() <= 0) then
+			notification.AddLegacy("Load items or resources and then press alt+use to call in a cargo plane!", NOTIFY_HINT, 3)
+		end
+		
+	end
+
 	function ENT:Draw()
 		local Ang, Pos = self:GetAngles(), self:GetPos()
 		local Up, Right, Forward, Resource = Ang:Up(), Ang:Right(), Ang:Forward(), tostring(self:GetItemCount())
