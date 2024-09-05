@@ -307,7 +307,6 @@ elseif CLIENT then
 		if (self:GetItemCount() <= 0) then
 			notification.AddLegacy("Load items or resources and then press alt+use to call in a cargo plane!", NOTIFY_HINT, 3)
 		end
-		
 	end
 
 	function ENT:Draw()
