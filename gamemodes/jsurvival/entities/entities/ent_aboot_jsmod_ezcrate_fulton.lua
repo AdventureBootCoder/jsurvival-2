@@ -76,16 +76,9 @@ if SERVER then
 		if self.NextLoad > CurTime() then return end
 		local ent = data.HitEntity
 
-		local Phys = ent:GetPhysicsObject()
-		if IsValid(ent) and IsValid(Phys) then
-			local Vol = Phys:GetVolume() or (ent.GetEZResource and ent:GetEZResource())
+		if IsValid(ent) then
+			local Vol, Mass = JMod.GetItemVolumeWeight(ent)
 			if Vol ~= nil then
-
-				Vol = math.ceil(Vol / JMod.VOLUMEDIV) -- Weird maths
-				if ent.EZstorageVolumeOverride then
-					Vol = ent.EZstorageVolumeOverride
-				end
-
 				if JSMod.ItemToJBux[ent:GetClass()] and ent:IsPlayerHolding() then
 					self.NextLoad = CurTime() + 0.5
 					timer.Simple(0, function()
