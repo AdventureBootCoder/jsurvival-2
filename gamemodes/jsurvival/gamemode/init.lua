@@ -25,6 +25,10 @@ hook.Add("PlayerInitialSpawn", "JS_INITIAL_PLAYERSPAWN", function(ply)
 	if ply:GetPData("JBux") then GAMEMODE:SetJBux(ply, ply:GetPData("JBux"), false) end
 end)
 
+local function IsPlayerRunning(ply) 
+	return  not(ply:GetMoveType() == MOVETYPE_NOCLIP) and not(IsValid(ply:GetVehicle())) and ply:IsSprinting() and ply:OnGround()
+end
+
 hook.Add("PlayerSpawn", "JS_SPAWN", function(ply) ply:SetNW2Float("JS_Stamina", 100) end)
 local PlayerThinkTime = 0
 hook.Add("Think", "JS_SPRINT_STAMINA", function()
@@ -33,26 +37,27 @@ hook.Add("Think", "JS_SPRINT_STAMINA", function()
 		PlayerThinkTime = Time + 1
 		for _, ply in player.Iterator() do
 			local Stamina = ply:GetNW2Float("JS_Stamina", 0)
-			if not ply:IsSprinting() and (Stamina < 100) then
-				ply:SetNW2Float("JS_Stamina", math.Clamp(Stamina + 3 * JMod.GetPlayerStrength(ply), 0, 100))
+			if not IsPlayerRunning(ply) and (Stamina < 100) then
+				ply:SetNW2Float("JS_Stamina", math.Clamp(Stamina + 2 * JMod.GetPlayerStrength(ply), 0, 100))
 				if Stamina >= 5 then ply:SprintEnable() end
+			end
+			if Stamina < 15 then
+				sound.Play("snds_jack_gmod/drown_gasp.ogg", ply:GetShootPos(), 60, math.random(90, 110))
 			end
 		end
 	end
 end)
 
 hook.Add("SetupMove", "JS_SPRINT", function(ply, mv, cmd)
-	if ply:InVehicle() then return end
-	if ply:GetMoveType() == MOVETYPE_NOCLIP then return end
-	if ply:IsSprinting() then
+	if IsPlayerRunning(ply) then
 		local Stamina = ply:GetNW2Float("JS_Stamina", 0)
 		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 0.05, 0, 100))
 		if Stamina < 5 then ply:SprintDisable() end
 	end
 
-	if ply:KeyPressed(IN_JUMP) then -- Check if the player jumped and subtract stamina if so
+	if ply:OnGround() and ply:KeyPressed(IN_JUMP) then -- Check if the player jumped and subtract stamina if so
 		local Stamina = ply:GetNW2Float("JS_Stamina", 0)
-		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 2, 0, 100))
+		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 5, 0, 100))
 	end
 end)
 
