@@ -29,7 +29,6 @@ if SERVER then
 		net.Start("jbuxlist")
 		net.WriteTable(JSMod.JBuxList)
 		net.Send(ply)
-		print("JBux List Networking")
 	end
 elseif CLIENT then
 	net.Receive("betterchatprint", function() chat.AddText(net.ReadColor(), net.ReadString()) end)

@@ -61,5 +61,5 @@ hook.Add("HUDPaint", "JS_Display_Stamina", function()
 	local InverseModifier = (1 / CurrentStamina * 300)
 	surface.SetDrawColor(40 + InverseModifier, 120 - InverseModifier, 140 - InverseModifier, 120) -- Blue color
 	--surface.SetDrawColor(0, 0, 0, 120)
-	surface.DrawRect(0, H - BarHeight, BarWidth, BarHeight) -- Draw the stamina bar at the bottom
+	surface.DrawRect(W / 2 - BarWidth / 2, H - BarHeight, BarWidth, BarHeight) -- Draw the stamina bar at the bottom
 end)
