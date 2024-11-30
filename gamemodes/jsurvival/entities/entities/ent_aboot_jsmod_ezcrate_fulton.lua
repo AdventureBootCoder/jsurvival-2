@@ -60,6 +60,30 @@ if SERVER then
 		self:SetItemCount(self.JModInv.volume)
 	end
 
+	JMod.GetItemVolumeWeight = JMod.GetItemVolumeWeight or function(ent)
+		if not IsValid(ent) then return nil end
+		local Phys = ent:GetPhysicsObject()
+		if not IsValid(Phys) then return nil end
+	
+		local Vol = Phys:GetVolume()
+		local Mass = 0
+		if Vol == nil then
+			local Mins, Maxs = ent:GetCollisionBounds()
+			local X = math.abs(Maxs.x - Mins.x)
+			local Y = math.abs(Maxs.y - Mins.y)
+			local Z = math.abs(Maxs.z - Mins.z)
+			Vol = X * Y * Z
+		end
+		Vol = ent.EZstorageVolumeOverride or math.Round(Vol / JMod.VOLUMEDIV, 2)
+		Mass = math.ceil(Phys:GetMass())
+		if ent.IsJackyEZresource then
+			Vol = 1
+			Mass = 1
+		end
+	
+		return Vol, Mass
+	end
+
 	function ENT:PhysicsCollide(data, physobj)
 		if (data.DeltaTime > 0.2) and (data.Speed > 100) then
 			self:EmitSound("Wood_Crate.ImpactHard")
