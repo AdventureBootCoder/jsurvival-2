@@ -143,7 +143,6 @@ if SERVER then
        	end
     end
    	function GM:PlayerNoClip(ply, desiredState)
-        print(JMod.IsAdmin(ply))
     	if not JMod.IsAdmin(ply) then -- the player wants to turn noclip off
         	return false -- always allow
     	elseif JMod.IsAdmin(ply) then

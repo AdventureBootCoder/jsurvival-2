@@ -325,7 +325,6 @@ end
 
 hook.Add("JMod_CanRadioRequest", "JSMOD_AIRSTRIKE_CHECK", function(ply, transceiver, pkg)
 	local SplitString = string.Split(pkg, " ")
-    PrintTable(SplitString)
 	if (SplitString[1] == "airstrike") and (SplitString[2] and Airstrikes[SplitString[2]]) then
 		StartAirstrike(pkg, transceiver, transceiver:GetOutpostID(), ply)
 		return true, "Calling in Airstrike!"
