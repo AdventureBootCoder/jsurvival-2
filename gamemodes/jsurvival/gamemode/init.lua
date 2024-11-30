@@ -13,9 +13,10 @@ end
 local color_yellow = Color(255, 170, 0)
 hook.Add("PlayerInitialSpawn", "JS_INITIAL_PLAYERSPAWN", function(ply)
 	timer.Simple(5, function()
-		BetterChatPrint(ply, "Welcome to JSurvival! To start surviving, you better bind 'jmod_ez_inv' to I or other key.", color_yellow)
-		BetterChatPrint(ply, "Then in inventory menu, press the 'scrounge' button", color_yellow)
-		BetterChatPrint(ply, "This will spawn some props that you need to collect for creating crafting table.", color_yellow)
+		BetterChatPrint(ply, "Welcome to JSurvival! To start surviving, press F3 to open your inventory.", color_yellow)
+		BetterChatPrint(ply, "Then in the inventory menu, press the 'scrounge' button or 4 on your keyboard.", color_yellow)
+		BetterChatPrint(ply, "This will spawn some props that you need to pile up for handcrafting a crafting table.", color_yellow)
+        BetterChatPrint(ply, "You can also ask any online players or Discord members for more info on how to play.", color_yellow)
 		if ply:IsListenServerHost() or ply:IsSuperAdmin() then
 			BetterChatPrint(ply, "Also you can edit the JMod config in inventory", color_yellow)
 			BetterChatPrint(ply, "To enable some useful features for improving realism gameplay.", color_yellow)
@@ -141,4 +142,12 @@ if SERVER then
             JSMod.JBuxListInfo(ply)
        	end
     end
+   	function GM:PlayerNoClip(ply, desiredState)
+        print(JMod.IsAdmin(ply))
+    	if not JMod.IsAdmin(ply) then -- the player wants to turn noclip off
+        	return false -- always allow
+    	elseif JMod.IsAdmin(ply) then
+        	return true -- allow administrators to enter noclip
+    	end
+	end
 end

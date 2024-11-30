@@ -8,10 +8,10 @@ concommand.Add("js_jbux_donate", function(ply, cmd, args)
 	if not(ply:Alive()) then return end
 	local target = tostring(args[1])
 	local amt = tonumber(args[2])
-	if not(amt) or (amt == 0) then return end
+	if not(amt) or (amt <= 0) then return end
 	local recipient
 	for k, v in player.Iterator() do
-		if string.lower(v:Nick()) == string.lower(target) then
+		if string.lower(v:Nick()) == string.lower(target) and v:Nick() ~= ply:Nick() then
 			recipient = v
 			break
 		end
@@ -19,11 +19,13 @@ concommand.Add("js_jbux_donate", function(ply, cmd, args)
 
 	if (recipient) and (recipient:Alive()) then 
 		GAMEMODE:SetJBux(recipient, GAMEMODE:GetJBux(recipient) + amt, true)
+        GAMEMODE:SetJBux(ply, GAMEMODE:GetJBux(ply) - amt, true)
 		BetterChatPrint(recipient, "You got ".. tostring(amt) .." JBux!", color_orange)
 		BetterChatPrint(ply, "You donated ".. tostring(amt) .." JBux!", color_orange)
 	elseif string.lower(target) == "team" then
 		recipient = ply:Team()
 		GAMEMODE:SetJBux(recipient, GAMEMODE:GetJBux(recipient) + amt, true)
+        GAMEMODE:SetJBux(ply, GAMEMODE:GetJBux(ply) - amt, true)
 		BetterChatPrint(ply, "You donated ".. tostring(amt) .." JBux!", color_orange)
 	end
 end, "Donates JBux to someone or your team")
@@ -35,11 +37,27 @@ hook.Add("PlayerSpawn", "JSMOD_ECONPLAYERSPAWN", function(ply, transition)
 	end)
 end)
 
+local NextStockUpdate = 0
+hook.Add("Think", "JSMOD_STOCKSIM", function()
+	local Time = CurTime()
+
+	if (Time > NextStockUpdate) then 
+		NextStockUpdate = Time + 60
+
+		JSMod.CurrentResourcePrices = JSMod.CurrentResourcePrices or table.FullCopy(JSMod.ResourceToJBux)
+		--[[for k, v in pairs(JSMod.CurrentResourcePrices) do
+			local BaseAmt = JSMod.ResourceToJBux[k]
+			local Low, High = BaseAmt * 0.5, BaseAmt * 1.5
+			local CurAmt = JSMod.CurrentResourcePrices[k]
+			JSMod.CurrentResourcePrices[k] = math.Clamp(CurAmt + math.Round(math.Rand(-0.01, 0.01), 2), Low, High)
+		end--]]
+	end
+end)
 local StandardRate = 200 -- To cover fuel ;)
 hook.Add("JMod_CanRadioRequest", "JSMOD_MONEY_CHECK", function(ply, transceiver, pkg)
 	local station = JMod.EZ_RADIO_STATIONS[transceiver:GetOutpostID()]
 
-	--[[if pkg == "stocks" then
+	if pkg == "stocks" then
 		timer.Simple(1, function()
 			if not(IsValid(transceiver)) then return end
 			local Msg, Num = 'current stock prices are:', 1
@@ -73,7 +91,7 @@ hook.Add("JMod_CanRadioRequest", "JSMOD_MONEY_CHECK", function(ply, transceiver,
 		end)
 
 		return true
-	end--]]
+	end
 
 	local PackageSpecs = JMod.Config.RadioSpecs.AvailablePackages[pkg]
 	if not(PackageSpecs) then return end
@@ -84,7 +102,7 @@ hook.Add("JMod_CanRadioRequest", "JSMOD_MONEY_CHECK", function(ply, transceiver,
 	ReqAmount = ReqAmount + StandardRate
 	if (ReqAmount <= 0) or (PackageSpecs.JBuxFree) then return end
 	local PlyAmt = GAMEMODE:GetJBux(ply)
-	if PlyAmt <= ReqAmount then 
+	if PlyAmt <= ReqAmount and ReqAmount >= 0 then 
 		return false, "Not enough JBux! (You need: "..tostring(ReqAmount - PlyAmt).." more)" 
 	else
 		GAMEMODE:SetJBux(ply, PlyAmt - ReqAmount)
@@ -202,39 +220,18 @@ hook.Add("InitPostEntity", "JSMOD_SCROUNGEMOD", function()
 	--"models/props_canal/boat001b.mdl", "models/props_vehicles/car004a_physics.mdl", "models/props_vehicles/car004b_physics.mdl", "models/props_interiors/refrigerator01a.mdl", "models/props_c17/bench01a.mdl", "models/props_junk/cardboard_box001a.mdl", "models/props_junk/cardboard_box001b.mdl", "models/props_junk/cardboard_box002a.mdl", "models/props_junk/cardboard_box002b.mdl", "models/props_junk/cardboard_box003a.mdl", "models/props_junk/cardboard_box003b.mdl", "models/props_junk/cardboard_box004a.mdl", "models/props_junk/wood_crate001a.mdl", "models/props_junk/wood_crate001a_damaged.mdl", "models/props_junk/wood_crate001a_damagedmax.mdl", "models/props_junk/wood_crate002a.mdl", "models/Items/item_item_crate.mdl", "models/props_c17/furnituredrawer001a.mdl", "models/props_c17/furnituredrawer003a.mdl", "models/props_lab/dogobject_wood_crate001a_damagedmax.mdl", "models/props_c17/canister01a.mdl", "models/props_c17/canister02a.mdl", "models/props_junk/gascan001a.mdl", "models/props_junk/metalgascan.mdl", "models/props_junk/propane_tank001a.mdl", "models/props_junk/propanecanister001a.mdl", "models/props_interiors/pot01a.mdl", "models/props_c17/oildrum001.mdl", "models/props_junk/metal_paintcan001a.mdl", "models/props_wasteland/controlroom_filecabinet001a.mdl", "models/props_junk/metal_paintcan001b.mdl", "models/props_trainstation/trashcan_indoor001a.mdl", "models/props_c17/suitcase001a.mdl", "models/props_c17/suitcase_passenger_physics.mdl", "models/props_c17/briefcase001a.mdl", "models/props_phx/construct/metal_plate1.mdl", "models/props_phx/construct/metal_plate1_tri.mdl", "models/props_phx/construct/glass/glass_plate1x1.mdl", "models/props_phx/construct/glass/glass_plate1x2.mdl", "models/hunter/plates/plate1x1.mdl", "models/hunter/plates/plate1x2.mdl", "models/props_phx/construct/wood/wood_panel1x1.mdl", "models/props_phx/construct/wood/wood_panel1x2.mdl", "models/props_phx/construct/wood/wood_panel2x2.mdl", "models/props_phx/construct/wood/wood_boardx1.mdl", "models/props_phx/construct/wood/wood_boardx2.mdl"
 end)
 
-local NextStockUpdate = 0
-hook.Add("Think", "JSMOD_STOCKSIM", function()
-	local Time = CurTime()
-
-	if (Time > NextStockUpdate) then 
-		NextStockUpdate = Time + 60
-
-		JSMod.CurrentResourcePrices = JSMod.CurrentResourcePrices or table.FullCopy(JSMod.ResourceToJBux)
-		--[[for k, v in pairs(JSMod.CurrentResourcePrices) do
-			local BaseAmt = JSMod.ResourceToJBux[k]
-			local Low, High = BaseAmt * 0.5, BaseAmt * 1.5
-			local CurAmt = JSMod.CurrentResourcePrices[k]
-			JSMod.CurrentResourcePrices[k] = math.Clamp(CurAmt + math.Round(math.Rand(-0.01, 0.01), 2), Low, High)
-		end--]]
-	end
-end)
-
 local RequiredPackages = {
 	["heli-export"] = {
 		description = "Helicopter Export of resources.",
 		category = "JSurvival",
 		JBuxPrice = 200,
-		results = {
-			"npc_manhack",
-		}
+		results = "npc_manhack"
 	},
 	["fulton-crate"] = {
 		description = "Fulton balloon crate for exporting resources.",
 		category = "JSurvival",
 		JBuxFree = true,
-		results = {
-			"ent_aboot_jsmod_ezcrate_fulton"
-		}
+		results = "ent_aboot_jsmod_ezcrate_fulton"
 	}
 }
 
@@ -328,6 +325,7 @@ end
 
 hook.Add("JMod_CanRadioRequest", "JSMOD_AIRSTRIKE_CHECK", function(ply, transceiver, pkg)
 	local SplitString = string.Split(pkg, " ")
+    PrintTable(SplitString)
 	if (SplitString[1] == "airstrike") and (SplitString[2] and Airstrikes[SplitString[2]]) then
 		StartAirstrike(pkg, transceiver, transceiver:GetOutpostID(), ply)
 		return true, "Calling in Airstrike!"

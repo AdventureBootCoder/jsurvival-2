@@ -25,14 +25,17 @@ JSMod.ResourceToJBux = {
 	[JMod.EZ_RESOURCE_TYPES.DIAMOND] = 100,
 	[JMod.EZ_RESOURCE_TYPES.PLATINUM] = 150,
 	[JMod.EZ_RESOURCE_TYPES.ANTIMATTER] = 1000,
-	[JMod.EZ_RESOURCE_TYPES.TUNGSTEN] = 3
+	[JMod.EZ_RESOURCE_TYPES.TUNGSTEN] = 3,
+    [JMod.EZ_RESOURCE_TYPES.CERAMIC] = 5,
+    [JMod.EZ_RESOURCE_TYPES.GAS] = 2
 }
 JSMod.ItemToJBux = {
 	["ent_jack_gmod_ezanomaly_gnome"] = 10000,
 	["ent_jack_gmod_ezarmor"] = 200,
-	["ent_jack_gmod_ezatmine"] = 300,
-	["ent_jack_gmod_ezfragnade"] = 25,
-	["ent_jack_gmod_ezfumigator"] = 1000,
+	["ent_jack_gmod_ezatmine"] = 460,
+	["ent_jack_gmod_ezfragnade"] = 70,
+	["ent_jack_gmod_ezfumigator"] = 250,
+    ["ent_jack_gmod_ezfishy"] = 5
 }
 JSMod.CurrentResourcePrices = table.FullCopy(JSMod.ResourceToJBux)
 JSMod.JBuxList = JSMod.JBuxList or {}

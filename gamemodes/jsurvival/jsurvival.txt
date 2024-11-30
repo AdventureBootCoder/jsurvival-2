@@ -2,7 +2,7 @@
 {
 	"base"		 "base"
 	"title"		 "JSurvival"
-	"category"	 "other"
+	"category"	 "pvp"
 	"menusystem" "1"
 	"version"	 "1"
 

@@ -6,8 +6,8 @@ GM.Website = ""
 local Cheats = GetConVar("sv_cheats")
 JSMod = JSMod or {}
 hook.Add("PlayerNoClip", "js-noclip", function(ply, desiredState)
+    print(JMod.IsAdmin(ply))
 	if Cheats:GetBool() or JMod.IsAdmin(ply) then return true end
-
 	return false
 end)
 
@@ -29,6 +29,10 @@ if SERVER then
 		net.Start("jbuxlist")
 		net.WriteTable(JSMod.JBuxList)
 		net.Send(ply)
+<<<<<<< Updated upstream
+=======
+		--print("JBux List Networking")
+>>>>>>> Stashed changes
 	end
 elseif CLIENT then
 	net.Receive("betterchatprint", function() chat.AddText(net.ReadColor(), net.ReadString()) end)
