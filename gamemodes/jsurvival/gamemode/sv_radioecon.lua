@@ -9,6 +9,8 @@ concommand.Add("js_jbux_donate", function(ply, cmd, args)
 	local target = tostring(args[1])
 	local amt = tonumber(args[2])
 	if not(amt) or (amt <= 0) then return end
+	amt = math.min(amt, GAMEMODE:GetJBux(ply))
+	
 	local recipient
 	for k, v in player.Iterator() do
 		if string.lower(v:Nick()) == string.lower(target) and v:Nick() ~= ply:Nick() then
