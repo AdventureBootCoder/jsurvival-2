@@ -280,7 +280,7 @@ if SERVER then
 
 	function ENT:Use(activator)
 		if (self:GetItemCount() <= 0) or self.PlaneComing then return end
-		local Alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
+		local Alt = JMod.IsAltUsing(activator)
 		if Alt then
 			if IsValid(self.Fulton) then
 				self.Fulton:Collapse()

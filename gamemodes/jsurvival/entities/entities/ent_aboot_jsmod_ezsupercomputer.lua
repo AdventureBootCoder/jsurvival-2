@@ -47,7 +47,7 @@ if(SERVER)then
 	function ENT:Use(activator)
 		if self.NextUseTime > CurTime() then return end
 		local State = self:GetState()
-		local Alt = activator:KeyDown(JMod.Config.General.AltFunctionKey)
+		local Alt = JMod.IsAltUsing(activator)
 		JMod.SetEZowner(self, activator, true)
 
 		if State == STATE_BROKEN then
