@@ -53,7 +53,7 @@ local CurrentStamina = 0
 hook.Add("HUDPaint", "JS_Display_Stamina", function()
 	local Ply, W, H = LocalPlayer(), ScrW(), ScrH()
 	local PlyStamina = Ply:GetNW2Float("JS_Stamina", 0)
-	CurrentStamina = Lerp(0.05, CurrentStamina, math.Clamp(PlyStamina, 0, 100))
+	CurrentStamina = Lerp(0.02, CurrentStamina, math.Clamp(PlyStamina, 0, 100))
 	local BarWidth = W * (CurrentStamina / 100)
 	local BarHeight = 10 -- Change the height of the stamina bar here
 

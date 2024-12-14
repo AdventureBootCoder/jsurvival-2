@@ -32,14 +32,15 @@ end
 
 hook.Add("PlayerSpawn", "JS_SPAWN", function(ply) ply:SetNW2Float("JS_Stamina", 100) end)
 local PlayerThinkTime = 0
+local PlayerThinkRate = 3
 hook.Add("Think", "JS_SPRINT_STAMINA", function()
 	local Time = CurTime()
 	if Time > PlayerThinkTime then
-		PlayerThinkTime = Time + 1
+		PlayerThinkTime = Time + PlayerThinkRate
 		for _, ply in player.Iterator() do
 			local Stamina = ply:GetNW2Float("JS_Stamina", 0)
 			if not IsPlayerRunning(ply) and (Stamina < 100) then
-				ply:SetNW2Float("JS_Stamina", math.Clamp(Stamina + 2 * JMod.GetPlayerStrength(ply), 0, 100))
+				ply:SetNW2Float("JS_Stamina", math.Clamp(Stamina + 2 * JMod.GetPlayerStrength(ply) * PlayerThinkRate, 0, 100))
 				if Stamina >= 5 then ply:SprintEnable() end
 			end
 			if Stamina < 15 then
@@ -50,6 +51,7 @@ hook.Add("Think", "JS_SPRINT_STAMINA", function()
 end)
 
 hook.Add("SetupMove", "JS_SPRINT", function(ply, mv, cmd)
+	if not IsFirstTimePredicted() then return end
 	if IsPlayerRunning(ply) then
 		local Stamina = ply:GetNW2Float("JS_Stamina", 0)
 		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 0.05, 0, 100))
