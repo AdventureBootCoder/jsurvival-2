@@ -54,34 +54,9 @@ if SERVER then
 	end
 
 	function ENT:CalcWeight()
-		JMod.UpdateInv(self)
 		self:GetPhysicsObject():SetMass(50 + self.JModInv.weight)
 		self:GetPhysicsObject():Wake()
 		self:SetItemCount(self.JModInv.volume)
-	end
-
-	JMod.GetItemVolumeWeight = JMod.GetItemVolumeWeight or function(ent)
-		if not IsValid(ent) then return nil end
-		local Phys = ent:GetPhysicsObject()
-		if not IsValid(Phys) then return nil end
-	
-		local Vol = Phys:GetVolume()
-		local Mass = 0
-		if Vol == nil then
-			local Mins, Maxs = ent:GetCollisionBounds()
-			local X = math.abs(Maxs.x - Mins.x)
-			local Y = math.abs(Maxs.y - Mins.y)
-			local Z = math.abs(Maxs.z - Mins.z)
-			Vol = X * Y * Z
-		end
-		Vol = ent.JModEZstorableVolume or math.Round(Vol / JMod.VOLUMEDIV, 2)
-		Mass = math.ceil(Phys:GetMass())
-		if ent.IsJackyEZresource then
-			Vol = 1
-			Mass = 1
-		end
-	
-		return Vol, Mass
 	end
 
 	function ENT:PhysicsCollide(data, physobj)
@@ -108,7 +83,6 @@ if SERVER then
 					timer.Simple(0, function()
 						if IsValid(self) and IsValid(ent) then
 							JMod.AddToInventory(self, ent)
-							self:CalcWeight()
 						end
 					end)
 				elseif ent.IsJackyEZresource and JSMod.CurrentResourcePrices[ent.EZsupplies] and ent:IsPlayerHolding() then
@@ -116,7 +90,6 @@ if SERVER then
 					timer.Simple(0, function()
 						if IsValid(self) and IsValid(ent) then
 							JMod.AddToInventory(self, {ent})
-							self:CalcWeight()
 						end
 					end)
 				end
