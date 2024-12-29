@@ -53,7 +53,7 @@ local HeartBeatInfo = {
 	resolution = 30,
 	points = {},
 	time = 2.5,
-	pattern = {[0] = 0, [1] = 0, [2] = 1, [3] = -1, [4] = 2, [5] = -2, [6] = 1, [7] = 0}--, [8] = 0},
+	pattern = {[0] = 0, [1] = 0, [2] = 1, [3] = -1, [4] = 2, [5] = -2, [6] = 1, [7] = 0, [8] = 0},
 }
 
 local HealthRectColor = Color(0, 0, 0, 150)
@@ -87,12 +87,12 @@ hook.Add("HUDPaint", "JS_Display_Stats", function()
 	--jprint(1 / OldStamina * MaxStamina)
 	local InverseModifier = (1 / SmoothStamina * 300)
 	surface.SetDrawColor(40 + InverseModifier, 120 - InverseModifier, 140 - InverseModifier, 120) -- Blue color
-	--surface.SetDrawColor(0, 0, 0, 120)
-	surface.DrawRect(W / 2 - BarWidth / 2, H - BarHeight, BarWidth, BarHeight) -- Draw the stamina bar at the bottom
+	surface.SetDrawColor(0, 0, 0, 120)
+	--surface.DrawRect(W / 2 - BarWidth / 2, H - BarHeight, BarWidth, BarHeight) -- Draw the stamina bar at the bottom
 
 	-- Health and shield stuff --
 	local healthRectWidth, healthRectHeight = 200, 100
-	--local healthRectWidth, healthRectHeight = 400, 200
+	--local healthRectWidth, healthRectHeight = 400, 200 -- Debug
 	local healthPosX, healthPosY = 15, H - healthRectHeight - 50
 
 	-- Draw default health value
@@ -118,7 +118,7 @@ hook.Add("HUDPaint", "JS_Display_Stats", function()
 	local PatternStep = HeartBeatInfo.resolution / PatternLength
 	for i = 0, HeartBeatInfo.resolution do
 		LastPointInfo = HeartBeatInfo.points[i - 1]
-		local TimeIndex = i + (CurTime()) * 2
+		local TimeIndex = i + (CurTime()) * 3
 		if TimeIndex > PatternLength then
 			TimeIndex = TimeIndex % PatternLength
 		end
@@ -143,7 +143,6 @@ hook.Add("HUDPaint", "JS_Display_Stats", function()
 			--draw.DrawText(tostring(math.Round(PatternYFrac, 2)), "JMod-Stencil-XS", DrawX + HeartBeatInfo.points[i].x, DrawY + HeartBeatInfo.points[i].y, HealthColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
 	end
-	HeartBeatInfo.time = HeartBeatInfo.time + RealFrameTime() * 2
 
 	local Armor = Ply:Armor()
 	if Armor > 0 then
@@ -214,7 +213,9 @@ hook.Add("HUDPaint", "JS_Display_Character", function()
 		local MoveX, MoveY = 0, 0
 		surface.SetMaterial(v.png)
 		if v.name == "lungs" then
-			surface.SetDrawColor(253, 185, 185, 120)
+			--surface.SetDrawColor(253, 185, 185, 120)
+			local StanimaColor = JMod.GoodBadColor(Ply:GetNW2Float("JS_Stamina", 0) / MaxStamina, true, 120)
+			surface.SetDrawColor(StanimaColor)
 			Wide = math.sin(CurTime()) * 10
 		elseif v.name == "heart" then
 			local LerpedCol = Color(255, 0, 0, 120):Lerp(Color(0, 0, 0, 120), 1 - (Ply:Health() / Ply:GetMaxHealth()))
