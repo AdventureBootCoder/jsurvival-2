@@ -52,7 +52,7 @@ end)
 local HeartBeatInfo = {
 	resolution = 30,
 	points = {},
-	time = 0,
+	time = 2.5,
 	pattern = {[0] = 0, [1] = 0, [2] = 1, [3] = -1, [4] = 2, [5] = -2, [6] = 1, [7] = 0}--, [8] = 0},
 }
 
@@ -92,7 +92,8 @@ hook.Add("HUDPaint", "JS_Display_Stats", function()
 
 	-- Health and shield stuff --
 	local healthRectWidth, healthRectHeight = 200, 100
-	local healthPosX, healthPosY = 15, H - healthRectHeight - 15
+	--local healthRectWidth, healthRectHeight = 400, 200
+	local healthPosX, healthPosY = 15, H - healthRectHeight - 50
 
 	-- Draw default health value
 	local Health = Ply:Health()
@@ -113,22 +114,34 @@ hook.Add("HUDPaint", "JS_Display_Stats", function()
 	draw.DrawText(BloodReadingText, "JMod-Stencil-MS", healthPosX + healthRectWidth / 2, healthPosY + healthRectHeight / 4, HealthColor, TEXT_ALIGN_CENTER)
 	draw.DrawText("mmHg", "JMod-Stencil-XS", healthPosX + healthRectWidth / 1.2, healthPosY + healthRectHeight / 6, HealthColor, TEXT_ALIGN_LEFT)
 
+	local PatternLength = #HeartBeatInfo.pattern
+	local PatternStep = HeartBeatInfo.resolution / PatternLength
 	for i = 0, HeartBeatInfo.resolution do
-		local CurrentTime = HeartBeatInfo.time
-		local CurPointInfo = HeartBeatInfo.points[i] or {x = 0, y = 0}
-		local NextPointInfo = (HeartBeatInfo.points[i + 1] and HeartBeatInfo.points[i + 1]) or CurPointInfo
-
-		CurPointInfo.x = healthPosX + i / HeartBeatInfo.resolution * healthRectWidth
-		local CurrentPatternIndex = i + math.floor(CurrentTime)
-		if CurrentPatternIndex > #HeartBeatInfo.pattern then
-			CurrentPatternIndex = CurrentPatternIndex % #HeartBeatInfo.pattern
+		LastPointInfo = HeartBeatInfo.points[i - 1]
+		local TimeIndex = i + (CurTime()) * 2
+		if TimeIndex > PatternLength then
+			TimeIndex = TimeIndex % PatternLength
 		end
-		--print(CurrentPatternIndex)
-		CurPointInfo.y = healthPosY + healthRectHeight - healthRectHeight / 4 + HeartBeatInfo.pattern[CurrentPatternIndex] * healthRectHeight / 16
 
-		surface.SetDrawColor(HealthColor.r, HealthColor.g, HealthColor.b)
-		surface.DrawLine(CurPointInfo.x, CurPointInfo.y, NextPointInfo.x, NextPointInfo.y)
-		HeartBeatInfo.points[i] = CurPointInfo
+		local CurrentPoint = HeartBeatInfo.pattern[math.Round(TimeIndex)]
+		local NextPoint = HeartBeatInfo.pattern[math.floor(math.Clamp(TimeIndex + PatternStep, CurrentPoint, PatternLength))]
+		local PatternYFrac = CurrentPoint
+
+		HeartBeatInfo.points[i] = {
+			x = 0,
+			y = PatternYFrac * (HelfFrac * healthRectHeight / 16)
+		}
+		local SegmentLength = healthRectWidth / HeartBeatInfo.resolution
+		local DrawX = healthPosX + SegmentLength * i
+		local DrawY = healthPosY + healthRectHeight - (healthRectHeight / 4)
+
+		if LastPointInfo then
+			surface.SetDrawColor(HealthColor)
+			local LastPointDrawX = DrawX + LastPointInfo.x - SegmentLength
+			local LastPointDrawY = DrawY + LastPointInfo.y
+			surface.DrawLine(LastPointDrawX, LastPointDrawY, DrawX + HeartBeatInfo.points[i].x, DrawY + HeartBeatInfo.points[i].y)
+			--draw.DrawText(tostring(math.Round(PatternYFrac, 2)), "JMod-Stencil-XS", DrawX + HeartBeatInfo.points[i].x, DrawY + HeartBeatInfo.points[i].y, HealthColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		end
 	end
 	HeartBeatInfo.time = HeartBeatInfo.time + RealFrameTime() * 2
 
