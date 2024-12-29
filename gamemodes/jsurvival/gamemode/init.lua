@@ -27,7 +27,7 @@ hook.Add("PlayerInitialSpawn", "JS_INITIAL_PLAYERSPAWN", function(ply)
 end)
 
 local function IsPlayerRunning(ply) 
-	return  not(ply:GetMoveType() == MOVETYPE_NOCLIP) and not(IsValid(ply:GetVehicle())) and ply:IsSprinting() and ply:OnGround()
+	return not(ply:GetMoveType() == MOVETYPE_NOCLIP) and not(IsValid(ply:GetVehicle())) and ply:IsSprinting() and ply:OnGround()
 end
 
 hook.Add("PlayerSpawn", "JS_SPAWN", function(ply) ply:SetNW2Float("JS_Stamina", 100) end)
