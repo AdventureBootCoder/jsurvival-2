@@ -54,6 +54,7 @@ if SERVER then
 	end
 
 	function ENT:CalcWeight()
+		JMod.UpdateInv(self)
 		self:GetPhysicsObject():SetMass(50 + self.JModInv.weight)
 		self:GetPhysicsObject():Wake()
 		self:SetItemCount(self.JModInv.volume)
@@ -234,13 +235,13 @@ if SERVER then
 
 		local JBuxToGain = GAMEMODE:CalcJBuxWorth(AvaliableResources)
 
-		if self.JModInv.EZitems and next(self.JModInv.EZitems) then
-			JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(self.JModInv.Items)
-			for k, v in pairs(self.JModInv.EZitems) do
+		if self.JModInv.items and next(self.JModInv.items) then
+			JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(self.JModInv.items)
+			for k, v in pairs(self.JModInv.items) do
 				SafeRemoveEntity(v.ent)
 			end
 		end
-		self.JModInv = {} -- Make sure there's absolutely no double dipping
+		self.JModInv = table.FullCopy(JMod.DEFAULT_INVENTORY) -- Make sure there's absolutely no double dipping
 
 		local Owner = JMod.GetEZowner(self)
 		if (JBuxToGain > 0) and IsValid(Owner) then

@@ -69,7 +69,7 @@ function GM:CalcJBuxWorth(item, amount, curDepth)
 	if not(item) then return 0 end
 	amount = amount or 1
 
-	if curDepth and curDepth > 5 then return 0 end
+	if curDepth and curDepth > 100 then return 0 end
 
 	local typToCheck = type(item)
 	local JBuxToGain = 0
@@ -88,9 +88,14 @@ function GM:CalcJBuxWorth(item, amount, curDepth)
 		end
 	elseif typToCheck == "table" then
 		for typ, amt in pairs(item) do
-			JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(typ, amt, (curDepth or 0) + 1)
+			if istable(amt) and amt.ent and IsValid(amt.ent) then
+				JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(amt.ent, 1, (curDepth or 0) + 1)
+			else
+				JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(typ, amt, (curDepth or 0) + 1)
+			end
 		end
 	end
+
 	return JBuxToGain, Exportables
 end
 
