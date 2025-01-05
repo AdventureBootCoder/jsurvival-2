@@ -198,7 +198,7 @@ for k, fileName in pairs(BodyPartPngs) do
 	end
 end
 
-local DisplaySize = 350
+local DisplaySize = 254
 local HeartBeat = 0
 local LungBreathe = 0
 
