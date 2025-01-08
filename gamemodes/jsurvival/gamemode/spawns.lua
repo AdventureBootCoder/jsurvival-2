@@ -95,7 +95,7 @@ local SuitibleSpawns = {}
 
 hook.Add("PlayerSelectSpawn", "JSurvivalSelectSpawn", function(ply) 
 	if not paraspawn:GetBool() then return end
-	if IsValid(ply.JModSpawnPointEntity) then return end
+	if IsValid(ply.JModSpawnPointEntity) and ((ply.JModSpawnPointEntity.nextSpawnTime or 0) < CurTime()) then return end
 	local SpawnPos = ply:GetPos()
 	local Navmeshareas = navmesh.GetAllNavAreas()
 	local GoodRadio = false
