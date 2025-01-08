@@ -27,18 +27,18 @@
 		3
 		{
 			"name"		"js_walkspeed"
-			"text"		"Default player walk speed (recommended to leave 160)"
+			"text"		"Default player walk speed (recommended to leave 180)"
 			"type"		"Numeric"
 			"singleplayer"	"1"
-			"default"	"160"
+			"default"	"180"
 		}
 		4
 		{
 			"name"		"js_runspeed"
-			"text"		"Default player run speed (recommended to leave 280)"
+			"text"		"Default player run speed (recommended to leave 300)"
 			"type"		"Numeric"
 			"singleplayer"	"1"
-			"default"	"280"
+			"default"	"300"
 		}
 		5
 		{

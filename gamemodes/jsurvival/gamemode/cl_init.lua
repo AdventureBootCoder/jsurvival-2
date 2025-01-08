@@ -118,7 +118,7 @@ hook.Add("HUDPaint", "JS_Display_Stats", function()
 	local PatternStep = HeartBeatInfo.resolution / PatternLength
 	for i = 0, HeartBeatInfo.resolution do
 		LastPointInfo = HeartBeatInfo.points[i - 1]
-		local TimeIndex = i + (CurTime()) * 3
+		local TimeIndex = i + (CurTime()) * 10
 		if TimeIndex > PatternLength then
 			TimeIndex = TimeIndex % PatternLength
 		end
