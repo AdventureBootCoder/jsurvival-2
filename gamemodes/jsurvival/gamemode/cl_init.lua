@@ -101,18 +101,21 @@ hook.Add("HUDPaint", "JS_Display_Stats", function()
 	local HealthColor = JMod.GoodBadColor(Health / Ply:GetMaxHealth(), true, 150)
 	-- Draw a small curved rectangle
 	draw.RoundedBox(8, healthPosX, healthPosY, healthRectWidth, healthRectHeight, HealthRectColor)
-	--draw.DrawText("Health: \n" .. Health, "JMod-Stencil-MS", healthPosX + healthRectWidth / 2, healthPosY + healthRectHeight / 8, HealthColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-	draw.DrawText("Blood Pressure: ", "JMod-Stencil-S", healthPosX + 10, healthPosY + 10, HealthColor, TEXT_ALIGN_LEFT)
-	local PressureMod = math.Round(10 * (1 - StanimFrac))
-	local DystolicBloodPressure = 40 + math.Round(HelfFrac * 40) + PressureMod
-	local SystolicBloodPressure = 60 + math.Round(HelfFrac * 60) - PressureMod
-	local BloodReadingText = tostring(SystolicBloodPressure).."/"..tostring(DystolicBloodPressure)
+	--[[draw.DrawText("Health: \n" .. Health, "JMod-Stencil-MS", healthPosX + healthRectWidth / 2, healthPosY + healthRectHeight / 8, HealthColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+	--draw.DrawText("Blood Pressure: ", "JMod-Stencil-S", healthPosX + 10, healthPosY + 10, HealthColor, TEXT_ALIGN_LEFT)
+	--draw.DrawText("mmHg", "JMod-Stencil-XS", healthPosX + healthRectWidth / 1.2, healthPosY + healthRectHeight / 6, HealthColor, TEXT_ALIGN_LEFT)
+	--local PressureMod = math.Round(10 * (1 - StanimFrac))
+	--local DystolicBloodPressure = 40 + math.Round(HelfFrac * 40) + PressureMod
+	--local SystolicBloodPressure = 60 + math.Round(HelfFrac * 60) - PressureMod
+	--local BloodReadingText = tostring(SystolicBloodPressure).."/"..tostring(DystolicBloodPressure)
 	if not Ply:Alive() then
 		BloodReadingText = "NO SIGNAL"
 	end
 	--"JMod-NumberLCD"
-	draw.DrawText(BloodReadingText, "JMod-Stencil-MS", healthPosX + healthRectWidth / 2, healthPosY + healthRectHeight / 4, HealthColor, TEXT_ALIGN_CENTER)
-	draw.DrawText("mmHg", "JMod-Stencil-XS", healthPosX + healthRectWidth / 1.2, healthPosY + healthRectHeight / 6, HealthColor, TEXT_ALIGN_LEFT)
+	--draw.DrawText(BloodReadingText, "JMod-Stencil-MS", healthPosX + healthRectWidth / 2, healthPosY + healthRectHeight / 4, HealthColor, TEXT_ALIGN_CENTER)
+	]]--
+	draw.DrawText("Operator Condition: ", "JMod-Stencil-S", healthPosX + 10, healthPosY + 10, HealthColor, TEXT_ALIGN_LEFT)
+	draw.DrawText(HelfFrac * 100 .. "%", "JMod-Stencil-MS", healthPosX + healthRectWidth / 2, healthPosY + healthRectHeight / 4, HealthColor, TEXT_ALIGN_CENTER)
 
 	local PatternLength = #HeartBeatInfo.pattern
 	local PatternStep = HeartBeatInfo.resolution / PatternLength
