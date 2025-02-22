@@ -18,7 +18,7 @@ if SERVER then
 	function BetterChatPrint(ply, msg, color)
 		if not (ply or msg or color) then return end
 		net.Start("betterchatprint")
-		net.WriteColor(color)
+		if color then net.WriteColor(color) end
 		net.WriteString(msg)
 		net.Send(ply)
 	end
@@ -29,10 +29,6 @@ if SERVER then
 		net.Start("jbuxlist")
 		net.WriteTable(JSMod.JBuxList)
 		net.Send(ply)
-<<<<<<< Updated upstream
-=======
-		--print("JBux List Networking")
->>>>>>> Stashed changes
 	end
 elseif CLIENT then
 	net.Receive("betterchatprint", function() chat.AddText(net.ReadColor(), net.ReadString()) end)

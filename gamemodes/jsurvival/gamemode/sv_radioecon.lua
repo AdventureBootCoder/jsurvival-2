@@ -10,15 +10,21 @@ concommand.Add("js_jbux_donate", function(ply, cmd, args)
 	local amt = tonumber(args[2])
 	if not(amt) or (amt <= 0) then return end
 	local recipient
+    local matches = {}
 	for k, v in player.Iterator() do
-		if string.lower(v:Nick()) == string.lower(target) and v:Nick() ~= ply:Nick() then
-			recipient = v
-			break
+		--if string.lower(v:Nick()) == string.lower(target) and v:Nick() ~= ply:Nick() then
+        if string.match(string.lower(v:Nick()), string.lower(target)) == string.lower(target) and v:Nick() ~= ply:Nick() then
+            table.insert(matches, v)
+            if table.Count(matches) == 1 then
+				recipient = v
+            else
+                ply:PrintMessage(HUD_PRINTTALK, "Please pick a more unique match!")
+			end
 		end
 	end
-
-	if (recipient) and (recipient:Alive()) then 
+	if (recipient) and amt <= GAMEMODE:GetJBux(ply) then 
 		GAMEMODE:SetJBux(recipient, GAMEMODE:GetJBux(recipient) + amt, true)
+        print(GAMEMODE:GetJBux(recipient))
         GAMEMODE:SetJBux(ply, GAMEMODE:GetJBux(ply) - amt, true)
 		BetterChatPrint(recipient, "You got ".. tostring(amt) .." JBux!", color_orange)
 		BetterChatPrint(ply, "You donated ".. tostring(amt) .." JBux!", color_orange)
@@ -28,6 +34,7 @@ concommand.Add("js_jbux_donate", function(ply, cmd, args)
         GAMEMODE:SetJBux(ply, GAMEMODE:GetJBux(ply) - amt, true)
 		BetterChatPrint(ply, "You donated ".. tostring(amt) .." JBux!", color_orange)
 	end
+    matches = {}
 end, "Donates JBux to someone or your team")
 
 hook.Add("PlayerSpawn", "JSMOD_ECONPLAYERSPAWN", function(ply, transition)
@@ -123,8 +130,8 @@ end)
 
 hook.Add("JMod_OnRadioDeliver", "JSMOD_EXPORT_GOODS", function(stationID, dropPos) 
 	local station = JMod.EZ_RADIO_STATIONS[stationID]
-	local DeliveryType = station.deliveryType--JMod.Config.RadioSpecs.AvailablePackages[station.deliveryType]
-
+	local DeliveryType = station.deliveryType --JMod.Config.RadioSpecs.AvailablePackages[station.deliveryType]
+        
 	if DeliveryType == "heli-export" then
 		local ExportPos = util.QuickTrace(dropPos, Vector(0, 0, -9e9)).HitPos + Vector(0, 0, 10)
 		local AvaliableResources = JMod.CountResourcesInRange(ExportPos, 200)
@@ -325,7 +332,7 @@ end
 
 hook.Add("JMod_CanRadioRequest", "JSMOD_AIRSTRIKE_CHECK", function(ply, transceiver, pkg)
 	local SplitString = string.Split(pkg, " ")
-    PrintTable(SplitString)
+    print(SplitString[1], SplitString[2])
 	if (SplitString[1] == "airstrike") and (SplitString[2] and Airstrikes[SplitString[2]]) then
 		StartAirstrike(pkg, transceiver, transceiver:GetOutpostID(), ply)
 		return true, "Calling in Airstrike!"

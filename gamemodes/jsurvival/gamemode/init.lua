@@ -17,7 +17,7 @@ hook.Add("PlayerInitialSpawn", "JS_INITIAL_PLAYERSPAWN", function(ply)
 		BetterChatPrint(ply, "Then in the inventory menu, press the 'scrounge' button or 4 on your keyboard.", color_yellow)
 		BetterChatPrint(ply, "This will spawn some props that you need to pile up for handcrafting a crafting table.", color_yellow)
         BetterChatPrint(ply, "You can also ask any online players or Discord members for more info on how to play.", color_yellow)
-		if ply:IsListenServerHost() or ply:IsSuperAdmin() then
+		if IsValid(ply) and (ply:IsListenServerHost() or ply:IsSuperAdmin()) then
 			BetterChatPrint(ply, "Also you can edit the JMod config in inventory", color_yellow)
 			BetterChatPrint(ply, "To enable some useful features for improving realism gameplay.", color_yellow)
 		end
@@ -131,7 +131,7 @@ if SERVER then
 		end
 	end
 	function GM:CanProperty( ply, property, ent)
-		if JMod.IsAdmin(ply) then 
+		if JMod.IsAdmin(ply) then
 			return true 
 		else
 			return false
