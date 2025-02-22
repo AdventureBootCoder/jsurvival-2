@@ -9,6 +9,8 @@ concommand.Add("js_jbux_donate", function(ply, cmd, args)
 	local target = tostring(args[1])
 	local amt = tonumber(args[2])
 	if not(amt) or (amt <= 0) then return end
+	amt = math.min(amt, GAMEMODE:GetJBux(ply))
+	
 	local recipient
     local matches = {}
 	for k, v in player.Iterator() do
@@ -18,7 +20,7 @@ concommand.Add("js_jbux_donate", function(ply, cmd, args)
             if table.Count(matches) == 1 then
 				recipient = v
             else
-                ply:PrintMessage(HUD_PRINTTALK, "Please pick a more unique match!")
+                ply:PrintMessage(HUD_PRINTCONSOLE, "Please pick a more unique match!")
 			end
 		end
 	end
@@ -332,7 +334,6 @@ end
 
 hook.Add("JMod_CanRadioRequest", "JSMOD_AIRSTRIKE_CHECK", function(ply, transceiver, pkg)
 	local SplitString = string.Split(pkg, " ")
-    print(SplitString[1], SplitString[2])
 	if (SplitString[1] == "airstrike") and (SplitString[2] and Airstrikes[SplitString[2]]) then
 		StartAirstrike(pkg, transceiver, transceiver:GetOutpostID(), ply)
 		return true, "Calling in Airstrike!"

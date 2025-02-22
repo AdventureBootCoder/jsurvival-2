@@ -39,8 +39,8 @@ JSMod.ResourceToJBux = {
     [JMod.EZ_RESOURCE_TYPES.COAL] = 1,
     [JMod.EZ_RESOURCE_TYPES.WATER] = 0.008333333333333,
     [JMod.EZ_RESOURCE_TYPES.POWER] = 0.33,
-    [JMod.EZ_RESOURCE_TYPES.CONCRETE] = 1.9
-    
+    [JMod.EZ_RESOURCE_TYPES.CONCRETE] = 1.9,
+	[JMod.EZ_RESOURCE_TYPES.CERAMIC] = 5
 }
 JSMod.ItemToJBux = {
 	["ent_jack_gmod_ezanomaly_gnome"] = 10000,
@@ -48,7 +48,7 @@ JSMod.ItemToJBux = {
 	["ent_jack_gmod_ezatmine"] = 460,
 	["ent_jack_gmod_ezfragnade"] = 70,
 	["ent_jack_gmod_ezfumigator"] = 250,
-    ["ent_jack_gmod_ezfishy"] = 5
+	["ent_jack_gmod_ezfishy"] = 5
 }
 JSMod.CurrentResourcePrices = table.FullCopy(JSMod.ResourceToJBux)
 JSMod.JBuxList = JSMod.JBuxList or {}
@@ -82,7 +82,7 @@ function GM:CalcJBuxWorth(item, amount, curDepth)
 	if not(item) then return 0 end
 	amount = amount or 1
 
-	if curDepth and curDepth > 5 then return 0 end
+	if curDepth and curDepth > 100 then return 0 end
 
 	local typToCheck = type(item)
 	local JBuxToGain = 0
@@ -101,9 +101,14 @@ function GM:CalcJBuxWorth(item, amount, curDepth)
 		end
 	elseif typToCheck == "table" then
 		for typ, amt in pairs(item) do
-			JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(typ, amt, (curDepth or 0) + 1)
+			if istable(amt) and amt.ent and IsValid(amt.ent) then
+				JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(amt.ent, 1, (curDepth or 0) + 1)
+			else
+				JBuxToGain = JBuxToGain + GAMEMODE:CalcJBuxWorth(typ, amt, (curDepth or 0) + 1)
+			end
 		end
 	end
+
 	return JBuxToGain, Exportables
 end
 

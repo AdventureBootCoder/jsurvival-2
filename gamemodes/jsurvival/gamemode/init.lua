@@ -27,38 +27,42 @@ hook.Add("PlayerInitialSpawn", "JS_INITIAL_PLAYERSPAWN", function(ply)
 end)
 
 local function IsPlayerRunning(ply) 
-	return  not(ply:GetMoveType() == MOVETYPE_NOCLIP) and not(IsValid(ply:GetVehicle())) and ply:IsSprinting() and ply:OnGround()
+	return not(ply:GetMoveType() == MOVETYPE_NOCLIP) and not(IsValid(ply:GetVehicle())) and ply:IsSprinting() --and ply:OnGround()
 end
 
 hook.Add("PlayerSpawn", "JS_SPAWN", function(ply) ply:SetNW2Float("JS_Stamina", 100) end)
-local PlayerThinkTime = 0
-hook.Add("Think", "JS_SPRINT_STAMINA", function()
-	local Time = CurTime()
-	if Time > PlayerThinkTime then
-		PlayerThinkTime = Time + 1
-		for _, ply in player.Iterator() do
-			local Stamina = ply:GetNW2Float("JS_Stamina", 0)
-			if not IsPlayerRunning(ply) and (Stamina < 100) then
-				ply:SetNW2Float("JS_Stamina", math.Clamp(Stamina + 2 * JMod.GetPlayerStrength(ply), 0, 100))
-				if Stamina >= 5 then ply:SprintEnable() end
-			end
-			if Stamina < 15 then
-				sound.Play("snds_jack_gmod/drown_gasp.ogg", ply:GetShootPos(), 60, math.random(90, 110))
-			end
-		end
+
+hook.Add("PlayerPostThink", "JS_SPRINT_STAMINA", function(ply)
+	if (ply.JS_NextStaminaRegenTime or 0) > CurTime() then return end
+	ply.JS_NextStaminaRegenTime = CurTime() + 3
+
+	local Stamina = ply:GetNW2Float("JS_Stamina", 0)
+	if not IsPlayerRunning(ply) and (Stamina < 100) then
+		ply:SetNW2Float("JS_Stamina", math.Clamp(Stamina + 3 * JMod.GetPlayerStrength(ply), 0, 100))
+		if Stamina >= 15 then ply:SprintEnable() end
+	end
+	if Stamina < 15 then
+		ply:EmitSound("snds_jack_gmod/drown_gasp.ogg", 60, math.random(90, 110))
 	end
 end)
 
 hook.Add("SetupMove", "JS_SPRINT", function(ply, mv, cmd)
+	if not IsFirstTimePredicted() then return end
+	local Stamina = ply:GetNW2Float("JS_Stamina", 0)
 	if IsPlayerRunning(ply) then
-		local Stamina = ply:GetNW2Float("JS_Stamina", 0)
-		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 0.05, 0, 100))
+		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 0.025, 0, 100))
 		if Stamina < 5 then ply:SprintDisable() end
+	end
+
+	if Stamina < 30 then
+		-- Reduce player's overall speed relative to their stamina
+		mv:SetMaxClientSpeed(mv:GetMaxClientSpeed() * (Stamina / 30))
+		mv:SetMaxSpeed(mv:GetMaxSpeed() * (Stamina / 30))
 	end
 
 	if ply:OnGround() and ply:KeyPressed(IN_JUMP) then -- Check if the player jumped and subtract stamina if so
 		local Stamina = ply:GetNW2Float("JS_Stamina", 0)
-		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 5, 0, 100))
+		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 3, 0, 100))
 	end
 end)
 
@@ -70,8 +74,8 @@ function GM:PlayerLoadout(ply)
 	local walkspeed = GetConVar("js_walkspeed")
 	local runspeed = GetConVar("js_runspeed")
 	ply:Give("wep_jack_gmod_hands") --ply:Give("wep_jack_gmod_eztoolbox")
-	ply:SetWalkSpeed(walkspeed:GetInt() or 160)
-	ply:SetRunSpeed(runspeed:GetInt() or 280)
+	ply:SetWalkSpeed(walkspeed:GetInt() or 180)
+	ply:SetRunSpeed(runspeed:GetInt() or 300)
 end
 if SERVER then
 	function GM:PlayerSpawnProp(ply, model)
@@ -143,7 +147,6 @@ if SERVER then
        	end
     end
    	function GM:PlayerNoClip(ply, desiredState)
-        print(JMod.IsAdmin(ply))
     	if not JMod.IsAdmin(ply) then -- the player wants to turn noclip off
         	return false -- always allow
     	elseif JMod.IsAdmin(ply) then

@@ -91,9 +91,11 @@ end)
 timer.Create("prop_spawn", 3, 0, SpawnPropTimer)
 
 local paraspawn = GetConVar("js_paraspawn")
+local SuitibleSpawns = {}
 
 hook.Add("PlayerSelectSpawn", "JSurvivalSelectSpawn", function(ply) 
 	if not paraspawn:GetBool() then return end
+	if IsValid(ply.JModSpawnPointEntity) and ((ply.JModSpawnPointEntity.nextSpawnTime or 0) < CurTime()) then return end
 	local SpawnPos = ply:GetPos()
 	local Navmeshareas = navmesh.GetAllNavAreas()
 	local GoodRadio = false
@@ -110,15 +112,24 @@ hook.Add("PlayerSelectSpawn", "JSurvivalSelectSpawn", function(ply)
 	end
 	
 	if not(GoodRadio) and next(Navmeshareas) then
-		local RandomMesh = Navmeshareas[math.random(#Navmeshareas)]
-		local Randompos = RandomMesh:GetCenter()
-		local Tries = 0
-		while not(RandomMesh:IsUnderwater()) and (util.QuickTrace(Randompos, Vector(0, 0, 9e9), ply).HitSky) and (Tries < 1000) do
-			Tries = Tries + 1
-			RandomMesh = Navmeshareas[math.random(#Navmeshareas)]
-			Randompos = RandomMesh:GetCenter()
+		if not next(SuitibleSpawns) then
+			for _, area in pairs(Navmeshareas) do
+				-- Test to make sure it's visible to the sky and not in the water
+				if not(area:IsUnderwater()) then
+					local PointToCheck = area:GetCenter()
+					local SkyTr = util.TraceLine({start = PointToCheck, endpos = PointToCheck + Vector(0, 0, 9e9), filter = {ply}, mask = MASK_SOLID_BRUSHONLY})
+
+					if SkyTr.HitSky then
+						local WaterTr = util.TraceLine({start = PointToCheck, endpos = PointToCheck - Vector(0, 0, 9e9), filter = {ply}, mask = MASK_WATER})
+
+						if not(WaterTr.Hit) then
+							table.insert(SuitibleSpawns, PointToCheck)
+						end
+					end
+				end
+			end
 		end
-		SpawnPos = util.QuickTrace(Randompos, Vector(0, 0, 128)).HitPos - Vector(0, 0, 64)
+		SpawnPos = util.QuickTrace(table.Random(SuitibleSpawns), Vector(0, 0, 128)).HitPos - Vector(0, 0, 64)
 	end
 
 	local DropPos = JMod.FindDropPosFromSignalOrigin(SpawnPos)
@@ -176,14 +187,14 @@ hook.Add("PlayerSpawn", "JS_RANDOM_SPAWN_DROP", function(ply, transit)
 			ply.BoxToEnter:GetPhysicsObject():SetVelocity(-DropVelocity * 2)
 		end)
 
-		timer.Simple(1, function()
-			if not IsValid(ply) or not ply:Alive() or (ply:InVehicle()) then return end
+		timer.Simple(.5, function()
+			if not IsValid(ply) or not ply:Alive() or not(ply:InVehicle()) then return end
 			
 			sound.Play("snd_jack_flyby_drop.mp3", DropPos, 150, 100)
 
 			for k, playa in pairs(ents.FindInSphere(DropPos, 6000)) do
-				if playa:IsPlayer() then
-					sound.Play("snd_jack_flyby_drop.mp3", playa:GetShootPos(), 50, 100)
+				if playa:IsPlayer() and playa ~= ply then
+					sound.Play("snd_jack_flyby_drop.mp3", playa:GetShootPos() + (DropPos - playa:GetShootPos()) * 2, 50, 100)
 				end
 			end
 		end)
