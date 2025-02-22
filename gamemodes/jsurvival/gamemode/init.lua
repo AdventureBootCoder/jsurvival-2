@@ -50,7 +50,7 @@ hook.Add("SetupMove", "JS_SPRINT", function(ply, mv, cmd)
 	if not IsFirstTimePredicted() then return end
 	local Stamina = ply:GetNW2Float("JS_Stamina", 0)
 	if IsPlayerRunning(ply) then
-		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 0.05, 0, 100))
+		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 0.025, 0, 100))
 		if Stamina < 5 then ply:SprintDisable() end
 	end
 
