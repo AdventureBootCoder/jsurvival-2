@@ -1,4 +1,4 @@
-﻿-- AdventureBoots 2024
+-- AdventureBoots 2024
 AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Author = "AdventureBoots"
