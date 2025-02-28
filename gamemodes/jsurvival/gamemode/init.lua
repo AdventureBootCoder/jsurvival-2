@@ -66,7 +66,7 @@ hook.Add("SetupMove", "JS_SPRINT", function(ply, mv, cmd)
 	end
 end)
 
-hook.Add("PlayerSwitchFlashlight", "JS_SWITCH_FLASHLIGHT", function(ply, enabled) if not JMod.PlyHasArmorEff(ply, "HEVsuit") and not JMod.PlyHasArmorEff(ply, "flashlight") and enabled then return false end end)
+hook.Add("PlayerSwitchFlashlight", "JS_SWITCH_FLASHLIGHT", function(ply, enabled) if not JModHL2.PlyWearingHEVsuit(playa) and not JMod.PlyHasArmorEff(ply, "flashlight") and enabled then return false end end)
 hook.Add("PlayerSwitchWeapon", "JS_INTERRUPT_WEAPON_SWITCH", function(ply, oldWep, newWep) if ply:IsValid() and newWep:IsValid() then 
 	--JMod.AddToInventory(ply, oldWep) 
 	end end)
