@@ -50,7 +50,7 @@ hook.Add("SetupMove", "JS_SPRINT", function(ply, mv, cmd)
 	if not IsFirstTimePredicted() then return end
 	local Stamina = ply:GetNW2Float("JS_Stamina", 0)
 	if IsPlayerRunning(ply) then
-		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 0.025, 0, 100))
+		ply:SetNW2Float("JS_Stamina", math.Clamp((Stamina or 0) - 0.01, 0, 100))
 		if Stamina < 5 then ply:SprintDisable() end
 	end
 
@@ -66,7 +66,7 @@ hook.Add("SetupMove", "JS_SPRINT", function(ply, mv, cmd)
 	end
 end)
 
-hook.Add("PlayerSwitchFlashlight", "JS_SWITCH_FLASHLIGHT", function(ply, enabled) if not JModHL2.PlyWearingHEVsuit(playa) and not JMod.PlyHasArmorEff(ply, "flashlight") and enabled then return false end end)
+hook.Add("PlayerSwitchFlashlight", "JS_SWITCH_FLASHLIGHT", function(ply, enabled) if not JModHL2.PlyWearingHEVsuit(ply) and not JMod.PlyHasArmorEff(ply, "flashlight") and enabled then return false end end)
 hook.Add("PlayerSwitchWeapon", "JS_INTERRUPT_WEAPON_SWITCH", function(ply, oldWep, newWep) if ply:IsValid() and newWep:IsValid() then 
 	--JMod.AddToInventory(ply, oldWep) 
 	end end)
