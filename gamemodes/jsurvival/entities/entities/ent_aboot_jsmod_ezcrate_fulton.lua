@@ -259,7 +259,11 @@ if SERVER then
 			if IsValid(self.Fulton) then
 				self.Fulton:Collapse()
 			else
-				self:ReleaseFulton(activator)
+				if GAMEMODE:CalcJBuxWorth(self.JModInv.items) > 0 or GAMEMODE:CalcJBuxWorth(self.JModInv.EZresources) > 0 then
+					self:ReleaseFulton(activator)
+				else
+					BetterChatPrint(activator, "You need to load items or resources into the crate first!")
+				end
 			end
 		else
 			net.Start("JMod_ItemInventory")

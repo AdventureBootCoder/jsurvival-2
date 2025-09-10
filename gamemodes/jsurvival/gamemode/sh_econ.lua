@@ -42,14 +42,14 @@ JSMod.ResourceToJBux = {
     [JMod.EZ_RESOURCE_TYPES.CONCRETE] = 1.9,
 	[JMod.EZ_RESOURCE_TYPES.CERAMIC] = 5
 }
-JSMod.ItemToJBux = {
+JSMod.ItemToJBux = {/*
 	["ent_jack_gmod_ezanomaly_gnome"] = 10000,
 	["ent_jack_gmod_ezarmor"] = 200,
 	["ent_jack_gmod_ezatmine"] = 460,
 	["ent_jack_gmod_ezfragnade"] = 70,
 	["ent_jack_gmod_ezfumigator"] = 250,
 	["ent_jack_gmod_ezfishy"] = 5
-}
+*/}
 JSMod.CurrentResourcePrices = table.FullCopy(JSMod.ResourceToJBux)
 JSMod.JBuxList = JSMod.JBuxList or {}
 local color_orange = Color(255, 136, 0)
@@ -78,6 +78,20 @@ function GM:SetJBux(ply, amt, silent)
 	end
 end
 
+function JSMod.JBuxPriceFromCraftable(classname)
+	local totalsum = 0
+	for name, craftInfo in pairs(JMod.Config.Craftables) do
+		if craftInfo.results == classname then
+			for key, req in pairs(craftInfo.craftingReqs) do
+				local jbuxreq = req * (JSMod.ResourceToJBux[key] or 1)
+				totalsum = totalsum + jbuxreq
+			end
+			--print(name, crt.results, math.Round(totalsum, -1))
+			return math.Round(totalsum, -1)
+		end
+	end
+end
+
 function GM:CalcJBuxWorth(item, amount, curDepth)
 	if not(item) then return 0 end
 	amount = amount or 1
@@ -91,6 +105,9 @@ function GM:CalcJBuxWorth(item, amount, curDepth)
 	if typToCheck == "Entity" then
 		if IsValid(item) and JSMod.ItemToJBux[item:GetClass()] then
 			JBuxToGain = JSMod.ItemToJBux[item:GetClass()] * amount
+			table.insert(Exportables, item)
+		elseif JSMod.JBuxPriceFromCraftable(item:GetClass()) then
+			JBuxToGain = JSMod.JBuxPriceFromCraftable(item:GetClass()) * amount * 1.5
 			table.insert(Exportables, item)
 		end
 	elseif typToCheck == "string" then

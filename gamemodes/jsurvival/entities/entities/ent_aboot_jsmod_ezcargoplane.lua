@@ -155,6 +155,60 @@ if SERVER then
 		return true
 	end)--]]
 
+	--[[local HeavyCategories = {
+		["Vehicles"] = true,
+		["JSurvival"] = true
+	}
+	hook.Add("JMod_OnRadioDeliver", "CustomPkgHandling", function(stationID, DropPos)
+		local station = JMod.EZ_RADIO_STATIONS[stationID]
+		local pkg = station.deliveryType
+		local pkgtable = JMod.Config.RadioSpecs.AvailablePackages[station.deliveryType]
+		--print(pkg)
+		
+		--if not HeavyCategories[pkgtable.category] then return nil end
+		if not isstring(pkgtable.results) then return nil end
+		local PickupVelocity = station.outpostDirection
+		local CargoPlane = ents.Create("ent_aboot_jsmod_ezcargoplane")
+		CargoPlane:SetPos(DropPos + Vector(0,0,5000))
+		CargoPlane:SetAngles(PickupVelocity:Angle())
+		CargoPlane.FlightDir = PickupVelocity
+		CargoPlane:Spawn()
+		for _, ply in player.Iterator() do
+			if IsValid(ply) then
+				local Pos = ply:GetPos()
+				local Dist = Pos:Distance(DropPos)
+				if Dist < 5000 then
+					local Direction = (Pos - DropPos):GetNormalized()
+					sound.Play("@julton/cargo_plane_flyby_mono.wav", Pos + Vector(0, 0, 100), 160, 100, 1)
+				end
+			end
+		end
+	
+		timer.Simple(10, function()
+			local Package = ents.Create(pkgtable.results)
+			Package:SetPos(DropPos + station.outpostDirection * -200)
+			Package:Spawn()
+			timer.Simple(0.1, function()
+				if not IsValid(Package) then return end
+				local Chute = ents.Create("ent_jack_gmod_ezparachute")
+				Chute:SetPos(Package:LocalToWorld(Package:OBBCenter()))
+				Chute:SetNW2Entity("Owner", Package)
+				Chute.ParachuteMdl = "models/jessev92/rnl/items/parachute_deployed.mdl" --Chute.ParachuteName = "Parachute"
+				Chute.Drag = JMod.Config.RadioSpecs.ParachuteDragMult / 5
+				Chute.MdlOffset = 50
+				Chute.ChuteColor = Color(255, 255, 255)
+				Chute:Spawn()
+				Chute:Activate()
+				Chute:SetNW2Float("ChuteProg", 2)
+				Package:SetNW2Bool("EZparachuting", true)
+				Package.EZparachute = Chute
+			end)
+		end)
+	
+		JMod.NotifyAllRadios(stationID, "good drop")
+		return true
+	end)--]]
+
 elseif CLIENT then
 	function ENT:Initialize()
 		--self:AddEFlags(EFL_IN_SKYBOX)
