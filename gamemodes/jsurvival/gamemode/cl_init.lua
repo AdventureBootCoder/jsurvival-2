@@ -116,7 +116,14 @@ hook.Add("HUDPaint", "JS_Display_Stats", function()
 	]]--
 	draw.DrawText("Operator Condition: ", "JMod-Stencil-S", healthPosX + 10, healthPosY + 10, HealthColor, TEXT_ALIGN_LEFT)
 	draw.DrawText(HelfFrac * 100 .. "%", "JMod-Stencil-MS", healthPosX + healthRectWidth / 2, healthPosY + healthRectHeight / 4, HealthColor, TEXT_ALIGN_CENTER)
-
+	local color_orange = Color(255, 136, 0)
+    local Wallet = JSMod.JBuxList[Ply:SteamID()] or 0
+    draw.Text({
+            text = "JBux Wallet: " .. Wallet,
+            font = "CloseCaption_Bold",
+            pos = {25, 300},
+            color = color_orange
+        })
 	local PatternLength = #HeartBeatInfo.pattern
 	local PatternStep = HeartBeatInfo.resolution / PatternLength
 	for i = 0, HeartBeatInfo.resolution do
