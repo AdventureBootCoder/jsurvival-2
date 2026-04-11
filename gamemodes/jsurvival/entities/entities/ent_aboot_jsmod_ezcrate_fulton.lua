@@ -268,7 +268,7 @@ if SERVER then
 		else
 			net.Start("JMod_ItemInventory")
 			net.WriteEntity(self)
-			net.WriteString("open_menu")
+			net.WriteInt(JMod.NETWORK_INDEX.ITEM_INVENTORY.OPEN_MENU, 8)
 			net.WriteTable(self.JModInv)
 			net.Send(activator)
 		end
@@ -322,18 +322,17 @@ elseif CLIENT then
 
 		if DetailDraw then
 			Ang:RotateAroundAxis(Ang:Right(), 90)
-			Ang:RotateAroundAxis(Ang:Up(), -90)
-			cam.Start3D2D(Pos + Up * 10 - Forward * 19.8 + Right, Ang, .15)
-			draw.SimpleText("JACKARUNDA INDUSTRIES", "JMod-Stencil-S", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			draw.SimpleText("STORAGE", "JMod-Stencil", 0, 15, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			draw.SimpleText("Capacity: " .. Resource .. "/" .. self.MaxItems, "JMod-Stencil-S", 0, 70, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			cam.Start3D2D(Pos - Forward * 19.5 + Right * 2, Ang, .15)
+			--draw.SimpleText("JACKARUNDA INDUSTRIES", "JMod-Stencil-S", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			draw.SimpleText("STORAGE", "JMod-Stencil-MS", 0, 15, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			draw.SimpleText("Capacity: " .. Resource .. "/" .. self.MaxItems, "JMod-Stencil-S", 0, 50, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			cam.End3D2D()
 			---
 			Ang:RotateAroundAxis(Ang:Right(), 180)
-			cam.Start3D2D(Pos + Up * 10 + Forward * 20.1 - Right, Ang, .15)
-			draw.SimpleText("JACKARUNDA INDUSTRIES", "JMod-Stencil-S", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			draw.SimpleText("STORAGE", "JMod-Stencil", 0, 15, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			draw.SimpleText("Capacity: " .. Resource .. "/" .. self.MaxItems, "JMod-Stencil-S", 0, 70, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			cam.Start3D2D(Pos + Forward * 20 + Right * 2, Ang, .15)
+			--draw.SimpleText("JACKARUNDA INDUSTRIES", "JMod-Stencil-S", 0, 0, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			draw.SimpleText("STORAGE", "JMod-Stencil-MS", 0, 15, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			draw.SimpleText("Capacity: " .. Resource .. "/" .. self.MaxItems, "JMod-Stencil-S", 0, 50, TxtCol, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			cam.End3D2D()
 		end
 	end
