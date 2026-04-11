@@ -29,7 +29,7 @@ ENT.EZconsumes = {
 	JMod.EZ_RESOURCE_TYPES.COOLANT
 }
 ENT.EZpowerProducer = false
-ENT.EZpowerSocket = Vector(3, -33, 15)
+ENT.EZpowerSocketPos = Vector(3, -33, 15)
 
 function ENT:CustomSetupDataTables()
 	self:NetworkVar("Float", 1, "Progress")
