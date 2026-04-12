@@ -167,62 +167,7 @@ hook.Add("JMod_OnRadioDeliver", "JSMOD_EXPORT_GOODS", function(stationID, dropPo
 			end
 		end)
 		return true
-	end --[[elseif DeliveryType == "fulton-export" then
-		local GoodPackage = nil
-		for k, ent in pairs(ents.FindByClass("ent_aboot_jsmod_ezcrate_fulton")) do
-			if ent:GetClass() == "ent_aboot_jsmod_ezcrate_fulton" and IsValid(ent.Fulton) and ent.Fulton.ReadyForPickup then
-				GoodPackage = ent
-
-				break
-			end
-		end
-
-		if IsValid(GoodPackage) then
-			local PickupVelocity, PickupPos = station.outpostDirection, GoodPackage:GetPos() + Vector(0, 0, GoodPackage.Fulton.DesiredAltitude)
-			local Tries = 0
-			local HitSky = false
-			local DirTr, OtherDirTr
-			while not(HitSky) and (Tries < 300) do
-				DirTr = util.TraceLine({start = PickupPos, endpos = PickupPos - (PickupVelocity * 9e9), filter = {GoodPackage, GoodPackage.Fulton}, mask = MASK_SOLID_BRUSHONLY})
-				OtherDirTr = util.TraceLine({start = PickupPos, endpos = PickupPos + (PickupVelocity * 9e9), filter = {GoodPackage, GoodPackage.Fulton}, mask = MASK_SOLID_BRUSHONLY})
-				if DirTr.HitSky and OtherDirTr.HitSky then
-					HitSky = true
-				else
-					Tries = Tries + 1
-					PickupVelocity = Vector(math.Rand(-1, 1), math.Rand(-1, 1), 0):GetNormalized()
-				end
-			end
-			
-			local CratePos = GoodPackage:GetPos()
-			local CargoPlane = ents.Create("ent_aboot_jsmod_ezcargoplane")
-			CargoPlane:SetPos(PickupPos + Vector(0, 0, -50) + PickupVelocity * -800)
-			CargoPlane:SetAngles(PickupVelocity:Angle())
-			CargoPlane.FlightDir = PickupVelocity
-			CargoPlane:Spawn()
-			sound.Play("@julton/cargo_plane_flyby_mono.wav", PickupPos, 160, 100, 1)
-
-			timer.Simple(10, function()
-				if not IsValid(GoodPackage) or not IsValid(GoodPackage.Fulton) or not IsValid(GoodPackage.Cable) then JMod.NotifyAllRadios(stationID, "drop failed") return end
-				GoodPackage.Fulton:SetPos(PickupPos)
-				GoodPackage.Fulton:OnRecover(PickupVelocity * -2500)
-				--
-				GoodPackage:GetPhysicsObject():EnableDrag(false)
-				GoodPackage:GetPhysicsObject():EnableGravity(false)
-				GoodPackage:GetPhysicsObject():SetVelocity(((GoodPackage:GetPos() - CargoPlane:GetPos()):GetNormalized() * 1000))
-				sound.Play("ambient/machines/catapult_throw.wav", CratePos + Vector(0, 0, 100), 75, 60, 1)
-				timer.Simple(math.random(3, 5), function()
-					if not IsValid(GoodPackage) then return end
-					GoodPackage:OnFultonRecover()
-				end)
-				JMod.NotifyAllRadios(stationID, "good drop")
-				station.nextReadyTime = CurTime() + (math.random(20, 35) * JMod.Config.RadioSpecs.DeliveryTimeMult)
-			end)
-			station.nextReadyTime = CurTime() + 20
-		else
-			JMod.NotifyAllRadios(stationID, "drop failed")
-		end
-		return true
-	end--]]
+	end
 end)
 
 hook.Add("InitPostEntity", "JSMOD_SCROUNGEMOD", function()
